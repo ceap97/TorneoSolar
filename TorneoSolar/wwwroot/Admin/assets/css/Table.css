@@ -1,0 +1,24 @@
+﻿.btn-exportar-excel {
+    background-color: green !important;
+    color: white !important;
+}
+
+.btn-exportar-CSV {
+    background-color: white !important;
+    color: black !important;
+}
+
+.btn-exportar-PDF {
+    background-color: red !important;
+    color: white !important;
+}
+
+.btn-print {
+    background-color: black !important;
+    color: white !important;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}

@@ -1,0 +1,298 @@
+﻿@model IEnumerable<TorneoSolar.Models.Noticias>
+
+
+    <section class="section swiper-container swiper-slider swiper-classic bg-gray-2" data-loop="true" data-autoplay="4000" data-simulate-touch="false" data-slide-effect="fade">
+    <div class="swiper-wrapper">
+        <div class="swiper-slide text-center" data-slide-bg="images/Poster1.0.jpg">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-xl-6">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="swiper-button swiper-button-prev"></div>
+    <div class="swiper-button swiper-button-next"></div>
+    <div class="swiper-pagination"></div>
+</section>
+<!-- Latest News-->
+<section class="section section-md bg-gray-100">
+    <div class="container">
+        <div class="row row-50">
+            <div class="col-lg-8">
+                <div class="main-component">
+                    <!-- Heading Component-->
+                    <article class="heading-component">
+                        <div class="heading-component-inner">
+                            <h5 class="heading-component-title">
+                                Ultima Hora
+                            </h5><a class="button button-xs button-gray-outline" href="#">Todas las noticias</a>
+                        </div>
+                    </article>
+                    <div class="row row-30">
+                        @foreach (var noticia in Model)
+                        {
+                            <div class="col-md-6">
+                                <!-- Post Future-->
+                                <article class="post-future">
+                                    <a class="post-future-figure" href="#"><img src="@noticia.Imagen" alt="" width="368" height="287" /></a>
+                                    <div class="post-future-main">
+                                        <h4 class="post-future-title"><a href="#">@noticia.Titulo</a></h4>
+                                        <div class="post-future-meta">
+                                            <!-- Badge-->
+                                            <div class="badge badge-secondary">
+                                                The Team
+                                            </div>
+                                            <div class="post-future-time">
+                                                <span class="icon mdi mdi-clock"></span>
+                                                <time datetime="@noticia.Fecha.ToString("yyyy-MM-dd")">@noticia.Fecha.ToString("MMMM dd, yyyy")</time>
+                                            </div>
+                                        </div>
+                                        <hr />
+                                        <div class="post-future-text">
+                                            <p>@noticia.Comentario</p>
+                                        </div>
+                                        <div class="post-future-footer group-flex group-flex-xs">
+                                            <a class="button button-gray-outline" href="#">Read more</a>
+                                            <div class="post-future-share">
+                                                <div class="inline-toggle-parent">
+                                                    <div class="inline-toggle icon material-icons-share"></div>
+                                                    <div class="inline-toggle-element">
+                                                        <ul class="list-inline">
+                                                            <li>Share</li>
+                                                            <li><a class="icon fa-facebook" href="#"></a></li>
+                                                            <li><a class="icon fa-twitter" href="#"></a></li>
+                                                            <li><a class="icon fa-google-plus" href="#"></a></li>
+                                                            <li><a class="icon fa-instagram" href="#"></a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <aside class="aside-components">
+                    <div class="aside-component">
+                        <div class="owl-carousel-outer-navigation-1">
+                            <!-- Heading Component-->
+                            <article class="heading-component">
+                                <div class="heading-component-inner">
+                                    <h5 class="heading-component-title">
+                                        Ultimos resultados
+                                    </h5>
+                                    <div class="owl-carousel-arrows-outline">
+                                        <div class="owl-nav">
+                                            <button class="owl-arrow owl-arrow-prev"></button>
+                                            <button class="owl-arrow owl-arrow-next"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                            <!-- Owl Carousel-->
+                            <div class="owl-carousel owl-spacing-1" data-items="1" data-dots="false" data-nav="true" data-autoplay="true" data-autoplay-speed="4000" data-stage-padding="0" data-loop="true" data-margin="30" data-mouse-drag="false" data-animation-in="fadeIn" data-animation-out="fadeOut" data-nav-custom=".owl-carousel-outer-navigation-1">
+                                <!-- Game Result Creative-->
+                                <article class="game-result game-result-creative">
+                                    <div class="game-result-main-vertical">
+                                        <div class="game-result-team game-result-team-horizontal game-result-team-first">
+                                            <figure class="game-result-team-figure">
+                                                <img src="images/team-sportland-31x41.png" alt="" width="31" height="41" />
+                                            </figure>
+                                            <div class="game-result-team-title">
+                                                <div class="game-result-team-name">Sportland</div>
+                                                <div class="game-result-team-country">Los angeles</div>
+                                            </div>
+                                            <div class="game-result-score game-result-score-big game-result-team-win">
+                                                2<span class="game-result-team-label game-result-team-label-right">Win</span>
+                                            </div>
+                                        </div><span class="game-result-team-divider">VS</span>
+                                        <div class="game-result-team game-result-team-horizontal game-result-team-second">
+                                            <figure class="game-result-team-figure">
+                                                <img src="images/team-fenix-40x32.png" alt="" width="40" height="32" />
+                                            </figure>
+                                            <div class="game-result-team-title">
+                                                <div class="game-result-team-name">Real madrid</div>
+                                                <div class="game-result-team-country">Spain</div>
+                                            </div>
+                                            <div class="game-result-score game-result-score-big">
+                                                1
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="game-result-footer">
+                                        <ul class="game-result-details">
+                                            <li>Home</li>
+                                            <li>New Yorkers Stadium</li>
+                                            <li>
+                                                <time datetime="2020-04-14">April 14, 2020</time>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </article>
+                                <!-- Game Result Creative-->
+                                <article class="game-result game-result-creative">
+                                    <div class="game-result-main-vertical">
+                                        <div class="game-result-team game-result-team-horizontal game-result-team-first">
+                                            <figure class="game-result-team-figure">
+                                                <img src="images/team-bavaria-fc-26x34.png" alt="" width="26" height="34" />
+                                            </figure>
+                                            <div class="game-result-team-title">
+                                                <div class="game-result-team-name">Bavaria FC</div>
+                                                <div class="game-result-team-country">Germany</div>
+                                            </div>
+                                            <div class="game-result-score game-result-score-big">
+                                                2
+                                            </div>
+                                        </div><span class="game-result-team-divider">VS</span>
+                                        <div class="game-result-team game-result-team-horizontal game-result-team-second">
+                                            <figure class="game-result-team-figure">
+                                                <img src="images/team-athletic-33x30.png" alt="" width="33" height="30" />
+                                            </figure>
+                                            <div class="game-result-team-title">
+                                                <div class="game-result-team-name">Atletico</div>
+                                                <div class="game-result-team-country">USA</div>
+                                            </div>
+                                            <div class="game-result-score game-result-score-big game-result-team-win">
+                                                3<span class="game-result-team-label game-result-team-label-right">Win</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="game-result-footer">
+                                        <ul class="game-result-details">
+                                            <li>Away</li>
+                                            <li>Bavaria Stadium</li>
+                                            <li>
+                                                <time datetime="2020-04-14">April 14, 2020</time>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </article>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="aside-component">
+                        <!-- Heading Component-->
+                        <article class="heading-component">
+                            <div class="heading-component-inner">
+                                <h5 class="heading-component-title">
+                                    Tabla de posiciones
+                                </h5><a class="button button-xs button-gray-outline" href="#">Ver tabla completa</a>
+                            </div>
+                        </article>
+                        <!-- Table team-->
+                        <div class="table-custom-responsive">
+                            <table class="table-custom table-standings table-classic">
+                                <thead>
+                                    <tr>
+                                        <th colspan="2">Team Position</th>
+                                        <th>W</th>
+                                        <th>L</th>
+                                        <th>PTS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span>1</span></td>
+                                        <td class="team-inline">
+                                            <div class="team-figure">
+                                                <img src="images/team-sportland-31x41.png" alt="" width="31" height="41" />
+                                            </div>
+                                            <div class="team-title">
+                                                <div class="team-name">Sportland</div>
+                                                <div class="team-country">USA</div>
+                                            </div>
+                                        </td>
+                                        <td>153</td>
+                                        <td>30</td>
+                                        <td>186</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span>2</span></td>
+                                        <td class="team-inline">
+                                            <div class="team-figure">
+                                                <img src="images/team-dream-team-34x34.png" alt="" width="34" height="34" />
+                                            </div>
+                                            <div class="team-title">
+                                                <div class="team-name">Dream team</div>
+                                                <div class="team-country">Spain</div>
+                                            </div>
+                                        </td>
+                                        <td>120</td>
+                                        <td>30</td>
+                                        <td>186</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span>3</span></td>
+                                        <td class="team-inline">
+                                            <div class="team-figure">
+                                                <img src="images/team-real-madrid-28x37.png" alt="" width="28" height="37" />
+                                            </div>
+                                            <div class="team-title">
+                                                <div class="team-name">Real Madrid</div>
+                                                <div class="team-country">Spain</div>
+                                            </div>
+                                        </td>
+                                        <td>100</td>
+                                        <td>30</td>
+                                        <td>186</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span>4</span></td>
+                                        <td class="team-inline">
+                                            <div class="team-figure">
+                                                <img src="images/team-celta-vigo-35x39.png" alt="" width="35" height="39" />
+                                            </div>
+                                            <div class="team-title">
+                                                <div class="team-name">Celta Vigo</div>
+                                                <div class="team-country">Italy</div>
+                                            </div>
+                                        </td>
+                                        <td>98</td>
+                                        <td>30</td>
+                                        <td>186</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span>5</span></td>
+                                        <td class="team-inline">
+                                            <div class="team-figure">
+                                                <img src="images/team-barcelona-30x35.png" alt="" width="30" height="35" />
+                                            </div>
+                                            <div class="team-title">
+                                                <div class="team-name">Barcelona</div>
+                                                <div class="team-country">Spain</div>
+                                            </div>
+                                        </td>
+                                        <td>98</td>
+                                        <td>30</td>
+                                        <td>186</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span>6</span></td>
+                                        <td class="team-inline">
+                                            <div class="team-figure">
+                                                <img src="images/team-bavaria-fc-26x34.png" alt="" width="26" height="34" />
+                                            </div>
+                                            <div class="team-title">
+                                                <div class="team-name">Bavaria FC</div>
+                                                <div class="team-country">Germany</div>
+                                            </div>
+                                        </td>
+                                        <td>98</td>
+                                        <td>30</td>
+                                        <td>186</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,71 @@
+﻿@model TorneoSolar.Models.TablaPosiciones
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+
+}
+
+<h1>Edit</h1>
+
+<h4>TablaPosicione</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="EquipoId" class="control-label"></label>
+                <select asp-for="EquipoId" class="form-control" asp-items="ViewBag.EquipoId"></select>
+                <span asp-validation-for="EquipoId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PJ" class="control-label"></label>
+                <input asp-for="PJ" class="form-control" />
+                <span asp-validation-for="PJ" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PG" class="control-label"></label>
+                <input asp-for="PG" class="form-control" />
+                <span asp-validation-for="PG" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PP" class="control-label"></label>
+                <input asp-for="PP" class="form-control" />
+                <span asp-validation-for="PP" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Puntos" class="control-label"></label>
+                <input asp-for="Puntos" class="form-control" />
+                <span asp-validation-for="Puntos" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PtsFavor" class="control-label"></label>
+                <input asp-for="PtsFavor" class="form-control" />
+                <span asp-validation-for="PtsFavor" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PtsContra" class="control-label"></label>
+                <input asp-for="PtsContra" class="form-control" />
+                <span asp-validation-for="PtsContra" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Diferencia" class="control-label"></label>
+                <input asp-for="Diferencia" class="form-control" />
+                <span asp-validation-for="Diferencia" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

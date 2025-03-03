@@ -1,0 +1,67 @@
+﻿@model TorneoSolar.Models.Partido
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+
+}
+
+<h1>Create</h1>
+
+<h4>Partido</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" class="needs-validation" novalidate>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Campo Fecha -->
+            <div class="form-group mb-3">
+                <label asp-for="FechaHora" class="form-label">Fecha del Partido</label>
+                <input asp-for="FechaHora" class="form-control" type="datetime-local" />
+                <span asp-validation-for="FechaHora" class="text-danger"></span>
+            </div>
+
+            <!-- Campo Lugar -->
+            <div class="form-group mb-3">
+                <label asp-for="Ubicacion" class="form-label">Lugar del Partido</label>
+                <input asp-for="Ubicacion" class="form-control" placeholder="Ingrese el lugar del partido" required />
+                <span asp-validation-for="Ubicacion" class="text-danger"></span>
+            </div>
+
+            <!-- Selección de Equipo Local -->
+            <div class="form-group mb-3">
+                <label asp-for="LocalEquipoId" class="form-label">Equipo Local</label>
+                <select asp-for="LocalEquipoId" class="form-control" asp-items="ViewBag.LocalEquipoId" required>
+                    <option value="">Seleccione un equipo</option>
+                </select>
+                <span asp-validation-for="LocalEquipoId" class="text-danger"></span>
+            </div>
+
+            <!-- Selección de Equipo Visitante -->
+            <div class="form-group mb-3">
+                <label asp-for="VisitanteEquipoId" class="form-label">Equipo Visitante</label>
+                <select asp-for="VisitanteEquipoId" class="form-control" asp-items="ViewBag.VisitanteEquipoId" required>
+                    <option value="">Seleccione un equipo</option>
+                </select>
+                <span asp-validation-for="VisitanteEquipoId" class="text-danger"></span>
+            </div>
+
+            <!-- Botón de envío -->
+            <div class="form-group mb-3">
+                <button type="submit" class="btn btn-primary">Crear Partido</button>
+                <a asp-action="Index" class="btn btn-secondary">Volver al Listado</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index1">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

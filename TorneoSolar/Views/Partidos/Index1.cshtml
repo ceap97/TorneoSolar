@@ -1,0 +1,54 @@
+﻿@model IEnumerable<TorneoSolar.Models.Partido>
+
+@{
+    ViewData["Title"] = "Index1";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+<h1>Index1</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaHora)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ubicacion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LocalEquipo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.VisitanteEquipo)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FechaHora)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Ubicacion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LocalEquipo.EquipoId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VisitanteEquipo.EquipoId)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.PartidoId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.PartidoId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.PartidoId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

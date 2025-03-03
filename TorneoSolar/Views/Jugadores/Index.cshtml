@@ -1,0 +1,76 @@
+﻿@model IEnumerable<TorneoSolar.Models.Jugadore>
+
+@{
+    ViewData["Title"] = "Jugadores";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="text-center my-4">Jugadores</h1>
+
+<div class="container">
+    <div class="row">
+        @foreach (var jugador in Model)
+        {
+            <div class="col-6 col-md-3 col-lg-2 mb-4 text-center">
+                <div class="player-photo-container">
+                    <a href="javascript:void(0);" onclick="showJugadorDetails(@jugador.JugadorId)">
+                        <img src="@jugador.Foto" alt="@jugador.Nombre" class="img-fluid player-photo">
+                    </a>
+                    <p class="mt-2">@jugador.Nombre</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showJugadorDetails(jugadorId) {
+            fetch(`/Jugadores/GetJugadorDetails/${jugadorId}`)
+                .then(response => response.json())
+                .then(data => {
+                    Swal.fire({
+                        title: data.nombre,
+                        html: `
+                            <p><strong>Fecha de Nacimiento:</strong> ${data.fechaNacimiento}</p>
+                            <p><strong>Identificación:</strong> ${data.identificacion}</p>
+                            <p><strong>Peso:</strong> ${data.peso}</p>
+                            <p><strong>Altura:</strong> ${data.altura}</p>
+                            <p><strong>Posición:</strong> ${data.posicion}</p>
+                            <p><strong>Equipo:</strong> ${data.equipo}</p>
+                        `,
+                        icon: 'info'
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching jugador details:', error);
+                    Swal.fire('Error', 'No se pudieron cargar los detalles del jugador.', 'error');
+                });
+        }
+    </script>
+}
+
+<style>
+    .player-photo-container {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .player-photo-container:hover {
+            transform: scale(1.05);
+        }
+
+    .player-photo {
+        max-height: 100px;
+        object-fit: contain;
+    }
+
+    p {
+        font-weight: bold;
+        font-size: 14px;
+        margin: 0;
+    }
+</style>

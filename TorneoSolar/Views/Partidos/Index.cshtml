@@ -1,0 +1,76 @@
+﻿@model IEnumerable<TorneoSolar.Models.Partido>
+
+@{
+    ViewData["Title"] = "Calendario de Partidos";
+
+    // Agrupar partidos por fecha
+    var partidosPorFecha = Model
+        .GroupBy(p => p.FechaHora.Date)
+        .OrderBy(g => g.Key)
+        .ToList();
+}
+
+<h1 class="text-center">Calendario de Partidos</h1>
+
+@foreach (var grupo in partidosPorFecha)
+{
+    var fecha = grupo.Key;
+    var titulo = fecha == DateTime.Today ? "HOY" :
+                 fecha == DateTime.Today.AddDays(1) ? "MAÑANA" :
+                 fecha.ToString("dddd, dd MMMM", new System.Globalization.CultureInfo("es-ES"));
+
+    <!-- Centrar el título de cada fecha -->
+    <h3 class="mt-4 text-center text-uppercase fw-bold">@titulo</h3>
+
+    <!-- Centrar los partidos -->
+    <div class="d-flex justify-content-center flex-wrap">
+        @foreach (var partido in grupo)
+        {
+            <div class="card shadow-sm m-2" style="width: 500px; max-width: 100%;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <!-- Equipo Local -->
+                        <div class="text-center" style="width: 45%;">
+                            <img src="@partido.LocalEquipo.Logo"
+                                 alt="@partido.LocalEquipo.Nombre"
+                                 style="height: 40px; object-fit: contain;">
+                            <p class="mb-0">@partido.LocalEquipo.Nombre</p>
+
+                            @if (partido.ResultadosPartido != null)
+                            {
+                                <p class="mt-1 fw-bold">Puntos: @partido.ResultadosPartido.PuntosLocal</p>
+                            }
+                            else
+                            {
+                                <p class="mt-1 text-muted">Pendiente</p>
+                            }
+                        </div>
+
+                        <!-- Información central (hora y previa) -->
+                        <div class="text-center">
+                            <p class="mb-1">@partido.FechaHora.ToString("hh:mm tt", new System.Globalization.CultureInfo("es-ES"))</p>
+                            <span class="badge bg-info text-white">Previa del Partido</span>
+                        </div>
+
+                        <!-- Equipo Visitante -->
+                        <div class="text-center" style="width: 45%;">
+                            <img src="@partido.VisitanteEquipo.Logo"
+                                 alt="@partido.VisitanteEquipo.Nombre"
+                                 style="height: 40px; object-fit: contain;">
+                            <p class="mb-0">@partido.VisitanteEquipo.Nombre</p>
+
+                            @if (partido.ResultadosPartido != null)
+                            {
+                                <p class="mt-1 fw-bold">Puntos: @partido.ResultadosPartido.PuntosVisitante</p>
+                            }
+                            else
+                            {
+                                <p class="mt-1 text-muted">Pendiente</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

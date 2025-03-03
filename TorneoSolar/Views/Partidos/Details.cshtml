@@ -1,0 +1,44 @@
+﻿@model TorneoSolar.Models.Partido
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Partido</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FechaHora)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.FechaHora)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Ubicacion)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Ubicacion)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.LocalEquipo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.LocalEquipo.Nombre)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.VisitanteEquipo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.VisitanteEquipo.Nombre)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.PartidoId">Edit</a> |
+    <a asp-action="Index1">Back to List</a>
+</div>

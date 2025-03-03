@@ -1,0 +1,79 @@
+﻿@model IEnumerable<TorneoSolar.Models.TablaPosiciones>
+
+@{
+    ViewData["Title"] = "Index1";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+
+}
+
+<h1>Index1</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PJ)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PG)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PP)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Puntos)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PtsFavor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PtsContra)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Diferencia)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Equipo)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.PJ)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PG)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PP)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Puntos)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PtsFavor)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PtsContra)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Diferencia)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Equipo.EquipoId)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

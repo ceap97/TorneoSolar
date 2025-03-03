@@ -1,0 +1,49 @@
+﻿@model IEnumerable<TorneoSolar.Models.Equipo>
+
+@{
+    ViewData["Title"] = "Equipos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="text-center my-4">Equipos Participantes</h1>
+
+<div class="container">
+    <div class="row">
+        @foreach (var equipo in Model)
+        {
+            <div class="col-6 col-md-3 col-lg-2 mb-4 text-center">
+                <div class="team-logo-container">
+                    <a asp-controller="Jugadores" asp-action="Index" asp-route-equipoId="@equipo.EquipoId">
+                        <img src="@equipo.Logo" alt="@equipo.Nombre" class="img-fluid team-logo">
+                    </a>
+                    <p class="mt-2">@equipo.Nombre</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .team-logo-container {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .team-logo-container:hover {
+            transform: scale(1.05);
+        }
+
+    .team-logo {
+        max-height: 100px;
+        object-fit: contain;
+    }
+
+    p {
+        font-weight: bold;
+        font-size: 14px;
+        margin: 0;
+    }
+</style>
