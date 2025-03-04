@@ -1,9 +1,14 @@
 {
   "dependencies": {
+    "mssql2": {
+      "ignored": "true",
+      "type": "mssql",
+      "connectionId": "ConnectionStrings:DatabaseConnection1",
+      "dynamicId": null
+    },
     "mssql1": {
       "type": "mssql",
-      "connectionId": "ConnectionStrings:DatabaseConnection",
-      "dynamicId": null
+      "connectionId": "server=ALEJA\\SQLEXPRESS; database=TorneoSolar; integrated security=true; Encrypt=false;Trusted_Connection=true"
     }
   }
 }
