@@ -11,7 +11,7 @@ public partial class Equipo
 
     public string Ciudad { get; set; } = null!;
 
-    public string? Logo { get; set; }
+    public string Logo { get; set; }
 
     public virtual ICollection<Jugadore> Jugadores { get; set; } = new List<Jugadore>();
 

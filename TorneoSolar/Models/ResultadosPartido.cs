@@ -13,5 +13,5 @@ public partial class ResultadosPartido
 
     public int PuntosVisitante { get; set; }
 
-    public virtual Partido? Partido { get; set; }
+    public virtual Partido Partido { get; set; }
 }

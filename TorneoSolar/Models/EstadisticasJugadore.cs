@@ -23,7 +23,7 @@ public partial class EstadisticasJugadore
 
     public int? MinutosJugados { get; set; }
 
-    public virtual Jugadore? Jugador { get; set; }
+    public virtual Jugadore Jugador { get; set; }
 
-    public virtual Partido? Partido { get; set; }
+    public virtual Partido Partido { get; set; }
 }

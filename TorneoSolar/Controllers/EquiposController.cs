@@ -58,32 +58,28 @@ namespace TorneoSolar.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EquipoId,Nombre,Ciudad")] Equipo equipo, IFormFile logo)
+        public async Task<IActionResult> Create([Bind("EquipoId,Nombre,Ciudad,Logo")] Equipo equipo, IFormFile logo)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    // Si se proporciona una imagen, se guarda en el servidor
-                    if (logo != null && logo.Length > 0)
+                    var fileName = $"{equipo.Nombre}.jpeg";  // Usar el nombre del equipo como nombre del archivo
+                    var filePath = Path.Combine(_uploadPath, fileName);
+
+                    // Crear el directorio si no existe
+                    if (!Directory.Exists(_uploadPath))
                     {
-                        var fileName = $"{equipo.Nombre}.jpeg";  // Usar el nombre del equipo como nombre del archivo
-                        var filePath = Path.Combine(_uploadPath, fileName);
-
-                        // Crear el directorio si no existe
-                        if (!Directory.Exists(_uploadPath))
-                        {
-                            Directory.CreateDirectory(_uploadPath);
-                        }
-
-                        // Guardar la imagen en el servidor
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await logo.CopyToAsync(stream);
-                        }
-
-                        equipo.Logo = $"/images/equipos/{fileName}";  // Guardar la ruta relativa en la base de datos
+                        Directory.CreateDirectory(_uploadPath);
                     }
+
+                    // Guardar la imagen en el servidor
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await logo.CopyToAsync(stream);
+                    }
+
+                    equipo.Logo = $"/images/equipos/{fileName}";  // Guardar la ruta relativa en la base de datos
 
                     _context.Add(equipo);
                     await _context.SaveChangesAsync();
@@ -91,16 +87,22 @@ namespace TorneoSolar.Controllers
                 }
                 return View(equipo);
             }
+            catch (IOException ioEx)
+            {
+                // Manejar errores específicos de IO
+                return BadRequest(new { message = "Error al guardar el archivo: " + ioEx.Message });
+            }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                // Manejar otros tipos de errores
+                return BadRequest(new { message = "Error al crear el equipo: " + ex.Message });
             }
         }
-    
 
 
-// GET: Equipos/Edit/5
-public async Task<IActionResult> Edit(int? id)
+
+        // GET: Equipos/Edit/5
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {

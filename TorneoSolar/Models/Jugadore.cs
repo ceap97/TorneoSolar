@@ -17,12 +17,12 @@ public partial class Jugadore
 
     public int? Altura { get; set; }
 
-    public string? Posicion { get; set; }
-    public string? Foto { get; set; }
+    public string Posicion { get; set; }
+    public string Foto { get; set; }
 
     public int? EquipoId { get; set; }
 
-    public virtual Equipo? Equipo { get; set; }
+    public virtual Equipo Equipo { get; set; }
 
     public virtual ICollection<EstadisticasJugadore> EstadisticasJugadores { get; set; } = new List<EstadisticasJugadore>();
 }
