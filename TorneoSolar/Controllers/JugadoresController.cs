@@ -21,11 +21,16 @@ namespace TorneoSolar.Controllers
             _context = context;
         }
 
-        // GET: Jugadores
-        public async Task<IActionResult> Index()
+        public IActionResult Index(int? equipoId)
         {
-            var torneoSolarContext = _context.Jugadores.Include(j => j.Equipo);
-            return View(await torneoSolarContext.ToListAsync());
+            var jugadores = _context.Jugadores.AsQueryable();
+
+            if (equipoId.HasValue)
+            {
+                jugadores = jugadores.Where(j => j.EquipoId == equipoId.Value);
+            }
+
+            return View(jugadores.ToList());
         }
         public async Task<IActionResult> Index1()
         {

@@ -61,7 +61,7 @@ namespace TorneoSolar.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,EquipoId,PJ,PG,PP,Puntos,PtsFavor,PtsContra,Diferencia")] TablaPosiciones TablaPosiciones)
+        public async Task<IActionResult> Create([Bind("Id,EquipoId,PJ,PG,PP,Puntos,PtsFavor,PtsContra")] TablaPosiciones TablaPosiciones)
         {
             if (ModelState.IsValid)
             {
@@ -72,6 +72,7 @@ namespace TorneoSolar.Controllers
             ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "EquipoId", TablaPosiciones.EquipoId);
             return View(TablaPosiciones);
         }
+
 
         // GET: TablaPosicioness/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -95,7 +96,7 @@ namespace TorneoSolar.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,EquipoId,PJ,PG,PP,Puntos,PtsFavor,PtsContra,Diferencia")] TablaPosiciones TablaPosiciones)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,EquipoId,PJ,PG,PP,Puntos,PtsFavor,PtsContra")] TablaPosiciones TablaPosiciones)
         {
             if (id != TablaPosiciones.Id)
             {
@@ -125,6 +126,7 @@ namespace TorneoSolar.Controllers
             ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "EquipoId", TablaPosiciones.EquipoId);
             return View(TablaPosiciones);
         }
+
 
         // GET: TablaPosicioness/Delete/5
         public async Task<IActionResult> Delete(int? id)
