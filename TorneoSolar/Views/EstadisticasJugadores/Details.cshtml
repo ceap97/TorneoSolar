@@ -1,68 +1,67 @@
 ﻿@model TorneoSolar.Models.EstadisticasJugadore
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalles de la Estadística de Jugador";
     Layout = "~/Views/Shared/_Admin.cshtml";
-
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>EstadisticasJugadore</h4>
+<div class="container mt-4">
+    <h2 class="text-primary">👀 Detalles de la Estadística de Jugador</h2>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Puntos)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Puntos)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Rebotes)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Rebotes)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Asistencias)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Asistencias)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Bloqueos)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Bloqueos)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Robos)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Robos)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.MinutosJugados)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.MinutosJugados)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Jugador)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Jugador.JugadorId)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Partido)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Partido.PartidoId)
         </dd>
     </dl>
+    <div class="mt-3">
+        <a asp-action="Edit" asp-route-id="@Model?.EstadisticaId" class="btn btn-warning btn-sm">✏️ Editar</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">⬅️ Volver a la Lista</a>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.EstadisticaId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+

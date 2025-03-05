@@ -1,71 +1,74 @@
 ﻿@model TorneoSolar.Models.EstadisticasJugadore
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Estadística de Jugador";
     Layout = "~/Views/Shared/_Admin.cshtml";
-
 }
 
-<h1>Edit</h1>
-
-<h4>EstadisticasJugadore</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="EstadisticaId" />
-            <div class="form-group">
-                <label asp-for="JugadorId" class="control-label"></label>
-                <select asp-for="JugadorId" class="form-control" asp-items="ViewBag.JugadorId"></select>
-                <span asp-validation-for="JugadorId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PartidoId" class="control-label"></label>
-                <select asp-for="PartidoId" class="form-control" asp-items="ViewBag.PartidoId"></select>
-                <span asp-validation-for="PartidoId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Puntos" class="control-label"></label>
-                <input asp-for="Puntos" class="form-control" />
-                <span asp-validation-for="Puntos" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Rebotes" class="control-label"></label>
-                <input asp-for="Rebotes" class="form-control" />
-                <span asp-validation-for="Rebotes" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Asistencias" class="control-label"></label>
-                <input asp-for="Asistencias" class="form-control" />
-                <span asp-validation-for="Asistencias" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Bloqueos" class="control-label"></label>
-                <input asp-for="Bloqueos" class="form-control" />
-                <span asp-validation-for="Bloqueos" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Robos" class="control-label"></label>
-                <input asp-for="Robos" class="form-control" />
-                <span asp-validation-for="Robos" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MinutosJugados" class="control-label"></label>
-                <input asp-for="MinutosJugados" class="form-control" />
-                <span asp-validation-for="MinutosJugados" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="container mt-4">
+    <h2 class="text-primary">✏️ Editar Estadística de Jugador</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="EstadisticaId" />
+                <div class="form-group mb-3">
+                    <label asp-for="JugadorId" class="form-label">Jugador</label>
+                    <select asp-for="JugadorId" class="form-select" asp-items="ViewBag.JugadorId"></select>
+                    <span asp-validation-for="JugadorId" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="PartidoId" class="form-label">Partido</label>
+                    <select asp-for="PartidoId" class="form-select" asp-items="ViewBag.PartidoId"></select>
+                    <span asp-validation-for="PartidoId" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Puntos" class="form-label">Puntos</label>
+                    <input asp-for="Puntos" class="form-control" />
+                    <span asp-validation-for="Puntos" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Rebotes" class="form-label">Rebotes</label>
+                    <input asp-for="Rebotes" class="form-control" />
+                    <span asp-validation-for="Rebotes" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Asistencias" class="form-label">Asistencias</label>
+                    <input asp-for="Asistencias" class="form-control" />
+                    <span asp-validation-for="Asistencias" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Bloqueos" class="form-label">Bloqueos</label>
+                    <input asp-for="Bloqueos" class="form-control" />
+                    <span asp-validation-for="Bloqueos" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Robos" class="form-label">Robos</label>
+                    <input asp-for="Robos" class="form-control" />
+                    <span asp-validation-for="Robos" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="MinutosJugados" class="form-label">Minutos Jugados</label>
+                    <input asp-for="MinutosJugados" class="form-control" />
+                    <span asp-validation-for="MinutosJugados" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Guardar" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="mt-3">
+        <a asp-action="Index" class="btn btn-outline-secondary">⬅️ Volver a la Lista</a>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
+
+
