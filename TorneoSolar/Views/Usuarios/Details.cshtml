@@ -1,37 +1,33 @@
 ﻿@model TorneoSolar.Models.Usuario
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalles del Usuario";
     Layout = "~/Views/Shared/_Admin.cshtml";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Usuario</h4>
+<div class="container mt-4">
+    <h2 class="text-primary">Detalles del Usuario</h2>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NombreUsuario)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NombreUsuario)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Correo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Correo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Clave)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Clave)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.UsuarioId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+    <div class="card shadow p-4">
+        <h4 class="card-title text-secondary mb-3">Información del Usuario</h4>
+
+        <dl class="row">
+            <dt class="col-sm-4 fw-bold text-end">Nombre de Usuario:</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.NombreUsuario)</dd>
+
+            <dt class="col-sm-4 fw-bold text-end">Correo Electrónico:</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.Correo)</dd>
+
+            <dt class="col-sm-4 fw-bold text-end">Clave:</dt>
+            <dd class="col-sm-8">
+                <span class="text-muted">(No se muestra por seguridad)</span>
+            </dd>
+        </dl>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a asp-action="Index" class="btn btn-outline-secondary">⬅️ Volver al listado</a>
+            <a asp-action="Edit" asp-route-id="@Model?.UsuarioId" class="btn btn-warning">✏️ Editar Usuario</a>
+        </div>
+    </div>
 </div>

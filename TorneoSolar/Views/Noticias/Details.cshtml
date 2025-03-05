@@ -1,38 +1,36 @@
 ﻿@model TorneoSolar.Models.Noticias
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalles de la Noticia";
     Layout = "~/Views/Shared/_Admin.cshtml";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Noticias</h4>
+<div class="container mt-4">
+    <h2 class="text-primary">👀 Detalles de la Noticia</h2>
     <hr />
     <dl class="row">
-        <dt class="col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Titulo)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Titulo)
         </dd>
-        <dt class="col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Comentario)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Comentario)
         </dd>
-        <dt class="col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Fecha)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Fecha)
         </dd>
-        <dt class="col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Imagen)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-9">
             @if (Model.Imagen != null)
             {
                 <img src="@Model.Imagen" alt="Imagen de la noticia" class="img-thumbnail" />
@@ -43,8 +41,9 @@
             }
         </dd>
     </dl>
+    <div class="mt-3">
+        <a asp-action="Edit" asp-route-id="@Model?.NoticiasId" class="btn btn-warning btn-sm">✏️ Editar</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">⬅️ Volver a la Lista</a>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.NoticiasId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+

@@ -1,44 +1,41 @@
 ﻿@model TorneoSolar.Models.Partido
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalles del Partido";
     Layout = "~/Views/Shared/_Admin.cshtml";
-
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Partido</h4>
+<div class="container mt-4">
+    <h2 class="text-primary">👀 Detalles del Partido</h2>
     <hr />
     <dl class="row">
-        <dt class="col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.FechaHora)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.FechaHora)
         </dd>
-        <dt class="col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Ubicacion)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Ubicacion)
         </dd>
-        <dt class="col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.LocalEquipo)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.LocalEquipo.Nombre)
         </dd>
-        <dt class="col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.VisitanteEquipo)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.VisitanteEquipo.Nombre)
         </dd>
     </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.PartidoId">Edit</a> |
-    <a asp-action="Index1">Back to List</a>
+    <div class="mt-3">
+        <a asp-action="Edit" asp-route-id="@Model?.PartidoId" class="btn btn-warning btn-sm">✏️ Editar</a>
+        <a asp-action="Index1" class="btn btn-outline-secondary">⬅️ Volver a la Lista</a>
+    </div>
 </div>

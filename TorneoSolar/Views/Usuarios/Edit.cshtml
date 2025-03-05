@@ -1,45 +1,51 @@
 ﻿@model TorneoSolar.Models.Usuario
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Usuario";
     Layout = "~/Views/Shared/_Admin.cshtml";
 }
 
-<h1>Edit</h1>
+<div class="container mt-4">
+    <h2 class="text-primary">Editar Usuario</h2>
+    <p class="text-muted">Modifica los datos del usuario y guarda los cambios.</p>
+    <hr />
 
-<h4>Usuario</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="UsuarioId" />
-            <div class="form-group">
-                <label asp-for="NombreUsuario" class="control-label"></label>
-                <input asp-for="NombreUsuario" class="form-control" />
-                <span asp-validation-for="NombreUsuario" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Correo" class="control-label"></label>
-                <input asp-for="Correo" class="form-control" />
-                <span asp-validation-for="Correo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Clave" class="control-label"></label>
-                <input asp-for="Clave" class="form-control" />
-                <span asp-validation-for="Clave" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <form asp-action="Edit" class="card shadow p-4">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <input type="hidden" asp-for="UsuarioId" />
+
+                <div class="mb-3">
+                    <label asp-for="NombreUsuario" class="form-label fw-bold"></label>
+                    <input asp-for="NombreUsuario" class="form-control" placeholder="Nombre de usuario" />
+                    <span asp-validation-for="NombreUsuario" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Correo" class="form-label fw-bold"></label>
+                    <input asp-for="Correo" class="form-control" type="email" placeholder="Correo electrónico" />
+                    <span asp-validation-for="Correo" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Clave" class="form-label fw-bold"></label>
+                    <input asp-for="Clave" class="form-control" type="password" placeholder="Contraseña" />
+                    <span asp-validation-for="Clave" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary">⬅️ Volver al listado</a>
+                    <button type="submit" class="btn btn-primary">💾 Guardar cambios</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
