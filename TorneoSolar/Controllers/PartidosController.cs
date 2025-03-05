@@ -17,6 +17,18 @@ namespace TorneoSolar.Controllers
         {
             _context = context;
         }
+        public async Task<IActionResult> UltimosResultados()
+        {
+            var ultimosResultados = await _context.Partidos
+                .Include(p => p.LocalEquipo)
+                .Include(p => p.VisitanteEquipo)
+                .Include(p => p.ResultadosPartido)
+                .OrderByDescending(p => p.FechaHora)
+                .Take(5) // Obtener los últimos 5 resultados
+                .ToListAsync();
+
+            return PartialView("_UltimosResultados", ultimosResultados);
+        }
 
         // GET: Partidos
         public async Task<IActionResult> Index()

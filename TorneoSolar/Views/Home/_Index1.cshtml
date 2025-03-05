@@ -1,21 +1,6 @@
-﻿@model IEnumerable<TorneoSolar.Models.Noticias>
+﻿@model TorneoSolar.Models.HomeViewModel
 
 
-    <section class="section swiper-container swiper-slider swiper-classic bg-gray-2" data-loop="true" data-autoplay="4000" data-simulate-touch="false" data-slide-effect="fade">
-    <div class="swiper-wrapper">
-        <div class="swiper-slide text-center" data-slide-bg="images/Poster1.0.jpg">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-xl-6">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="swiper-button swiper-button-prev"></div>
-    <div class="swiper-button swiper-button-next"></div>
-    <div class="swiper-pagination"></div>
-</section>
 <!-- Latest News-->
 <section class="section section-md bg-gray-100">
     <div class="container">
@@ -31,7 +16,7 @@
                         </div>
                     </article>
                     <div class="row row-30">
-                        @foreach (var noticia in Model)
+                        @foreach (var noticia in Model.Noticias)
                         {
                             <div class="col-md-6">
                                 <!-- Post Future-->
@@ -80,82 +65,7 @@
                             </article>
                             <!-- Owl Carousel-->
                             <div class="owl-carousel owl-spacing-1" data-items="1" data-dots="false" data-nav="true" data-autoplay="true" data-autoplay-speed="4000" data-stage-padding="0" data-loop="true" data-margin="30" data-mouse-drag="false" data-animation-in="fadeIn" data-animation-out="fadeOut" data-nav-custom=".owl-carousel-outer-navigation-1">
-                                <!-- Game Result Creative-->
-                                <article class="game-result game-result-creative">
-                                    <div class="game-result-main-vertical">
-                                        <div class="game-result-team game-result-team-horizontal game-result-team-first">
-                                            <figure class="game-result-team-figure">
-                                                <img src="images/team-sportland-31x41.png" alt="" width="31" height="41" />
-                                            </figure>
-                                            <div class="game-result-team-title">
-                                                <div class="game-result-team-name">Sportland</div>
-                                                <div class="game-result-team-country">Los angeles</div>
-                                            </div>
-                                            <div class="game-result-score game-result-score-big game-result-team-win">
-                                                2<span class="game-result-team-label game-result-team-label-right">Win</span>
-                                            </div>
-                                        </div><span class="game-result-team-divider">VS</span>
-                                        <div class="game-result-team game-result-team-horizontal game-result-team-second">
-                                            <figure class="game-result-team-figure">
-                                                <img src="images/team-fenix-40x32.png" alt="" width="40" height="32" />
-                                            </figure>
-                                            <div class="game-result-team-title">
-                                                <div class="game-result-team-name">Real madrid</div>
-                                                <div class="game-result-team-country">Spain</div>
-                                            </div>
-                                            <div class="game-result-score game-result-score-big">
-                                                1
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="game-result-footer">
-                                        <ul class="game-result-details">
-                                            <li>Home</li>
-                                            <li>New Yorkers Stadium</li>
-                                            <li>
-                                                <time datetime="2020-04-14">April 14, 2020</time>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </article>
-                                <!-- Game Result Creative-->
-                                <article class="game-result game-result-creative">
-                                    <div class="game-result-main-vertical">
-                                        <div class="game-result-team game-result-team-horizontal game-result-team-first">
-                                            <figure class="game-result-team-figure">
-                                                <img src="images/team-bavaria-fc-26x34.png" alt="" width="26" height="34" />
-                                            </figure>
-                                            <div class="game-result-team-title">
-                                                <div class="game-result-team-name">Bavaria FC</div>
-                                                <div class="game-result-team-country">Germany</div>
-                                            </div>
-                                            <div class="game-result-score game-result-score-big">
-                                                2
-                                            </div>
-                                        </div><span class="game-result-team-divider">VS</span>
-                                        <div class="game-result-team game-result-team-horizontal game-result-team-second">
-                                            <figure class="game-result-team-figure">
-                                                <img src="images/team-athletic-33x30.png" alt="" width="33" height="30" />
-                                            </figure>
-                                            <div class="game-result-team-title">
-                                                <div class="game-result-team-name">Atletico</div>
-                                                <div class="game-result-team-country">USA</div>
-                                            </div>
-                                            <div class="game-result-score game-result-score-big game-result-team-win">
-                                                3<span class="game-result-team-label game-result-team-label-right">Win</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="game-result-footer">
-                                        <ul class="game-result-details">
-                                            <li>Away</li>
-                                            <li>Bavaria Stadium</li>
-                                            <li>
-                                                <time datetime="2020-04-14">April 14, 2020</time>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </article>
+                                @await Html.PartialAsync("~/Views/Partidos/_UltimosResultados.cshtml", Model.UltimosResultados)
                             </div>
                         </div>
                     </div>
