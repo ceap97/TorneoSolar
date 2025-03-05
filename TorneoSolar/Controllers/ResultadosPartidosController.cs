@@ -17,6 +17,49 @@ namespace TorneoSolar.Controllers
         {
             _context = context;
         }
+        private async Task ActualizarTablaPosiciones(ResultadosPartido resultadosPartido)
+        {
+            var partido = await _context.Partidos
+                .Include(p => p.LocalEquipo)
+                .Include(p => p.VisitanteEquipo)
+                .FirstOrDefaultAsync(p => p.PartidoId == resultadosPartido.PartidoId);
+
+            if (partido == null) return;
+
+            var equipoLocal = await _context.TablaPosiciones.FirstOrDefaultAsync(tp => tp.EquipoId == partido.LocalEquipoId);
+            var equipoVisitante = await _context.TablaPosiciones.FirstOrDefaultAsync(tp => tp.EquipoId == partido.VisitanteEquipoId);
+
+            if (equipoLocal == null || equipoVisitante == null) return;
+
+            equipoLocal.PJ++;
+            equipoVisitante.PJ++;
+
+            equipoLocal.PtsFavor += resultadosPartido.PuntosLocal;
+            equipoLocal.PtsContra += resultadosPartido.PuntosVisitante;
+
+            equipoVisitante.PtsFavor += resultadosPartido.PuntosVisitante;
+            equipoVisitante.PtsContra += resultadosPartido.PuntosLocal;
+
+            if (resultadosPartido.PuntosLocal > resultadosPartido.PuntosVisitante)
+            {
+                equipoLocal.PG++;
+                equipoLocal.Puntos += 2;
+                equipoVisitante.PP++;
+            }
+            else if (resultadosPartido.PuntosLocal < resultadosPartido.PuntosVisitante)
+            {
+                equipoVisitante.PG++;
+                equipoVisitante.Puntos += 2;
+                equipoLocal.PP++;
+            }
+
+            equipoLocal.Diferencia = equipoLocal.PtsFavor - equipoLocal.PtsContra;
+            equipoVisitante.Diferencia = equipoVisitante.PtsFavor - equipoVisitante.PtsContra;
+
+            _context.Update(equipoLocal);
+            _context.Update(equipoVisitante);
+            await _context.SaveChangesAsync();
+        }
 
         // GET: ResultadosPartidos
         public async Task<IActionResult> Index()
@@ -67,11 +110,13 @@ namespace TorneoSolar.Controllers
             {
                 _context.Add(resultadosPartido);
                 await _context.SaveChangesAsync();
+                await ActualizarTablaPosiciones(resultadosPartido);
                 return RedirectToAction(nameof(Index));
             }
             ViewData["PartidoId"] = new SelectList(_context.Partidos, "PartidoId", "PartidoId", resultadosPartido.PartidoId);
             return View(resultadosPartido);
         }
+
 
         // GET: ResultadosPartidos/Edit/5
         public async Task<IActionResult> Edit(int? id)
