@@ -25,17 +25,28 @@
 
 @section Scripts {
     <script>
+        function calculateAge(fechaNacimiento) {
+            const birthDate = new Date(fechaNacimiento);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDifference = today.getMonth() - birthDate.getMonth();
+            if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
         function showJugadorDetails(jugadorId) {
             fetch(`/Jugadores/GetJugadorDetails/${jugadorId}`)
                 .then(response => response.json())
                 .then(data => {
+                    const age = calculateAge(data.fechaNacimiento);
                     Swal.fire({
                         title: data.nombre,
                         html: `
-                            <p><strong>Fecha de Nacimiento:</strong> ${data.fechaNacimiento}</p>
-                            <p><strong>Identificación:</strong> ${data.identificacion}</p>
-                            <p><strong>Peso:</strong> ${data.peso}</p>
-                            <p><strong>Altura:</strong> ${data.altura}</p>
+                            <p><strong>Edad:</strong> ${age} años</p>
+                            <p><strong>Peso:</strong> ${data.peso} kg</p>
+                            <p><strong>Altura:</strong> ${data.altura} cm</p>
                             <p><strong>Posición:</strong> ${data.posicion}</p>
                             <p><strong>Equipo:</strong> ${data.equipo}</p>
                         `,
@@ -74,3 +85,4 @@
         margin: 0;
     }
 </style>
+
