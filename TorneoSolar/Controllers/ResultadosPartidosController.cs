@@ -17,6 +17,49 @@ namespace TorneoSolar.Controllers
         {
             _context = context;
         }
+        private async Task RevertirTablaPosiciones(ResultadosPartido resultadosPartido)
+        {
+            var partido = await _context.Partidos
+                .Include(p => p.LocalEquipo)
+                .Include(p => p.VisitanteEquipo)
+                .FirstOrDefaultAsync(p => p.PartidoId == resultadosPartido.PartidoId);
+
+            if (partido == null) return;
+
+            var equipoLocal = await _context.TablaPosiciones.FirstOrDefaultAsync(tp => tp.EquipoId == partido.LocalEquipoId);
+            var equipoVisitante = await _context.TablaPosiciones.FirstOrDefaultAsync(tp => tp.EquipoId == partido.VisitanteEquipoId);
+
+            if (equipoLocal == null || equipoVisitante == null) return;
+
+            equipoLocal.PJ--;
+            equipoVisitante.PJ--;
+
+            equipoLocal.PtsFavor -= resultadosPartido.PuntosLocal;
+            equipoLocal.PtsContra -= resultadosPartido.PuntosVisitante;
+
+            equipoVisitante.PtsFavor -= resultadosPartido.PuntosVisitante;
+            equipoVisitante.PtsContra -= resultadosPartido.PuntosLocal;
+
+            if (resultadosPartido.PuntosLocal > resultadosPartido.PuntosVisitante)
+            {
+                equipoLocal.PG--;
+                equipoLocal.Puntos -= 2;
+                equipoVisitante.PP--;
+            }
+            else if (resultadosPartido.PuntosLocal < resultadosPartido.PuntosVisitante)
+            {
+                equipoVisitante.PG--;
+                equipoVisitante.Puntos -= 2;
+                equipoLocal.PP--;
+            }
+
+            equipoLocal.Diferencia = equipoLocal.PtsFavor - equipoLocal.PtsContra;
+            equipoVisitante.Diferencia = equipoVisitante.PtsFavor - equipoVisitante.PtsContra;
+
+            _context.Update(equipoLocal);
+            _context.Update(equipoVisitante);
+            await _context.SaveChangesAsync();
+        }
         private async Task ActualizarTablaPosiciones(ResultadosPartido resultadosPartido)
         {
             var partido = await _context.Partidos
@@ -136,8 +179,6 @@ namespace TorneoSolar.Controllers
         }
 
         // POST: ResultadosPartidos/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ResultadoId,PartidoId,PuntosLocal,PuntosVisitante")] ResultadosPartido resultadosPartido)
@@ -151,8 +192,15 @@ namespace TorneoSolar.Controllers
             {
                 try
                 {
+                    var resultadoAnterior = await _context.ResultadosPartidos.AsNoTracking().FirstOrDefaultAsync(r => r.ResultadoId == id);
+                    if (resultadoAnterior != null)
+                    {
+                        await RevertirTablaPosiciones(resultadoAnterior);
+                    }
+
                     _context.Update(resultadosPartido);
                     await _context.SaveChangesAsync();
+                    await ActualizarTablaPosiciones(resultadosPartido);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -198,10 +246,10 @@ namespace TorneoSolar.Controllers
             var resultadosPartido = await _context.ResultadosPartidos.FindAsync(id);
             if (resultadosPartido != null)
             {
+                await RevertirTablaPosiciones(resultadosPartido);
                 _context.ResultadosPartidos.Remove(resultadosPartido);
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
