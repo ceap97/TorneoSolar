@@ -4,147 +4,130 @@
     var userImage = Url.Content($"~/images/usuarios/{userName}.jpeg");
     var esEmpleado = User.Claims.Any(c => c.Type == "EmpleadoId" && !string.IsNullOrEmpty(c.Value));
 }
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="A fully featured admin theme which can be used to build CRM, CMS, etc.">
-        <meta name="author" content="Coderthemes">
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A fully featured admin theme which can be used to build CRM, CMS, etc.">
+    <meta name="author" content="Coderthemes">
 
-        <link rel="shortcut icon" href="~/admin/assets/images/favicon.ico">
-        <title>Caribbean Shore</title>
+    <link rel="shortcut icon" href="~/admin/assets/images/favicon.ico">
+    <title>LigaElSolarMedellin</title>
 
-        <!--Morris Chart CSS -->
-        <link href="~/admin/assets/plugins/morris/morris.css" rel="stylesheet" />
+    <!-- App css -->
+    <link href="~/admin/assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/admin/assets/css/icons.css" rel="stylesheet" />
+    <link href="~/admin/assets/css/style.css" rel="stylesheet" />
+    <script src="~/admin/assets/js/modernizr.min.js"></script>
+    @await RenderSectionAsync("Estilos", required: false)
+</head>
 
-        <!-- App css -->
-        <link href="~/admin/assets/css/bootstrap.min.css" rel="stylesheet" />
-        <a href="~/admin/assets/css/icons.css.map">~/admin/assets/css/icons.css.map</a>
-        <link href="~/admin/assets/css/icons.css" rel="stylesheet" />
-        <a href="~/admin/assets/css/style.css.map">~/admin/assets/css/style.css.map</a>
-        <link href="~/admin/assets/css/style.css" rel="stylesheet" />
-        <script src="~/admin/assets/js/modernizr.min.js"></script>
-        @await RenderSectionAsync("Estilos", required: false)
-    </head>
+<body class="fixed-left">
 
+    <!-- Begin page -->
+    <div id="wrapper">
 
-    <body class="fixed-left">
+        <!-- Top Bar Start -->
+        <div class="topbar">
 
-        <!-- Begin page -->
-        <div id="wrapper">
-
-            <!-- Top Bar Start -->
-            <div class="topbar">
-
-                <!-- LOGO -->
-                <div class="topbar-left">
+            <!-- LOGO -->
+            <div class="topbar-left">
                 <a href="/Admin" class="logo">
-                        <img src="/images/Solar.png" alt="" style="max-height: 170px;">
-                    </a>
-                </div>
-
-
-                <!-- Button mobile view to collapse sidebar menu -->
-                <div class="navbar navbar-default" role="navigation">
-                    <div class="container-fluid">
-
-                        <!-- Page title -->
-                        <ul class="nav navbar-nav list-inline navbar-left">
-                            <li class="list-inline-item">
-                                <button class="button-menu-mobile open-left">
-                                    <i class="mdi mdi-menu"></i>
-                                </button>
-                            </li>
-                            <li class="list-inline-item">
-                                <h4 class="page-title">Dashboard</h4>
-                            </li>
-                        </ul>
-
-                        <nav class="navbar-custom">
-
-                            <ul class="list-unstyled topbar-right-menu float-right mb-0">
-
-                                <li>
-                                    <!-- Notification -->
-                                    <div class="notification-box">
-                                        <ul class="list-inline mb-0">
-                                            <li>
-                                                <a href="javascript:void(0);" class="right-bar-toggle">
-                                                    <i class="mdi mdi-bell-outline noti-icon"></i>
-                                                </a>
-                                                <div class="noti-dot">
-                                                    <span class="dot"></span>
-                                                    <span class="pulse"></span>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <!-- End Notification bar -->
-                                </li>
-
-                                <li class="hide-phone">
-                                    <form class="app-search">
-                                        <input type="text" placeholder="Search..."
-                                               class="form-control">
-                                        <button type="submit"><i class="fa fa-search"></i></button>
-                                    </form>
-                                </li>
-
-                            </ul>
-                        </nav>
-                    </div><!-- end container -->
-                </div><!-- end navbar -->
+                    <img src="/images/Solar.png" alt="" style="max-height: 170px;">
+                </a>
             </div>
-            <!-- Top Bar End -->
-            <!-- ========== Left Sidebar Start ========== -->
-            <div class="left side-menu">
-                <div class="sidebar-inner slimscrollleft">
 
-                    <!-- User -->
-                    <div class="user-box">
-                        <div class="user-img">
-                        </div>
-                        <h5><a href="">@User.Identity.Name  </a> </h5>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <a href="#">
-                                    <i class="mdi mdi-settings"></i>
-                                </a>
+            <!-- Button mobile view to collapse sidebar menu -->
+            <div class="navbar navbar-default" role="navigation">
+                <div class="container-fluid">
+
+                    <!-- Page title -->
+                    <ul class="nav navbar-nav list-inline navbar-left">
+                        <li class="list-inline-item">
+                            <button class="button-menu-mobile open-left">
+                                <i class="mdi mdi-menu"></i>
+                            </button>
+                        </li>
+                        <li class="list-inline-item">
+                            <h4 class="page-title">Dashboard</h4>
+                        </li>
+                    </ul>
+
+                    <nav class="navbar-custom">
+
+                        <ul class="list-unstyled topbar-right-menu float-right mb-0">
+
+                            <li>
+                                <!-- Notification -->
+                                <div class="notification-box">
+                                    <ul class="list-inline mb-0">
+                                        <li>
+                                            <a href="javascript:void(0);" class="right-bar-toggle">
+                                                <i class="mdi mdi-bell-outline noti-icon"></i>
+                                            </a>
+                                            <div class="noti-dot">
+                                                <span class="dot"></span>
+                                                <span class="pulse"></span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- End Notification bar -->
                             </li>
 
-                            <li class="list-inline-item">
-                                <a asp-controller="Home" asp-action="CerrarSesion">
-                                    <i class="mdi mdi-power"></i>
-                                </a>
+                            <li class="hide-phone">
+                                <form class="app-search">
+                                    <input type="text" placeholder="Search..." class="form-control">
+                                    <button type="submit"><i class="fa fa-search"></i></button>
+                                </form>
                             </li>
+
                         </ul>
+                    </nav>
+                </div><!-- end container -->
+            </div><!-- end navbar -->
+        </div>
+        <!-- Top Bar End -->
+        <!-- ========== Left Sidebar Start ========== -->
+        <div class="left side-menu">
+            <div class="sidebar-inner slimscrollleft">
+
+                <!-- User -->
+                <div class="user-box">
+                    <div class="user-img">
                     </div>
-                    <!-- End User -->
-                    <!--- Sidemenu -->
-                    <div id="sidebar-menu">
-                        <ul>
-                            <li class="text-muted menu-title">Navigation</li>
-                           
-                            <li class="has_sub">
-                                <a href="javascript:void(0);" class="waves-effect">
-                                    <i class="mdi mdi-cogs"></i><span class="badge badge-warning pull-right">1</span><span>
-                                        Medicion
-                                    </span>
-                                </a>
-                                <ul class="list-unstyled">
-                                    <li>
+                    <h5><a href="">@User.Identity.Name</a></h5>
+                    <ul class="list-inline">
+                        <li class="list-inline-item">
+                            <a href="#">
+                                <i class="mdi mdi-settings"></i>
+                            </a>
+                        </li>
+
+                        <li class="list-inline-item">
+                            <a asp-controller="Home" asp-action="CerrarSesion">
+                                <i class="mdi mdi-power"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- End User -->
+                <!--- Sidemenu -->
+                <div id="sidebar-menu">
+                    <ul>
+                                <li>
                                     <a asp-controller="Usuarios" asp-action="Index" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Usuarios </span> </a>
-                                    </li>
-                                      <li>
+                                </li>
+                                <li>
                                     <a asp-controller="Equipos" asp-action="Index1" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Equipos </span> </a>
-                                    </li>
+                                </li>
                                 <li>
                                     <a asp-controller="EstadisticasJugadores" asp-action="Index" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Estadisticas de Jugadores </span> </a>
                                 </li>
-                                  <li>
+                                <li>
                                     <a asp-controller="Jugadores" asp-action="Index1" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Jugadores </span> </a>
-                                    </li>
+                                </li>
                                 <li>
                                     <a asp-controller="Partidos" asp-action="Index1" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Partidos </span> </a>
                                 </li>
@@ -153,82 +136,73 @@
                                 </li>
                                 <li>
                                     <a asp-controller="ResultadosPartidos" asp-action="Index1" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Resultados de Partidos </span> </a>
-                                </li>   
+                                </li>
                                 <li>
                                     <a asp-controller="TablaPosiciones" asp-action="Index1" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Tabla de Posiciones </span> </a>
                                 </li>
-                            </ul>
-                            </li>
-                        </ul>
-                        <div class="clearfix"></div>
-                    </div>
-                    <!-- Sidebar -->
+                            </ul> 
                     <div class="clearfix"></div>
-
                 </div>
+                <!-- Sidebar -->
+                <div class="clearfix"></div>
 
             </div>
-            <!-- Left Sidebar End -->
-            <!-- ============================================================== -->
-            <!-- Start right Content here -->
-            <!-- ============================================================== -->
-            <div class="content-page">
-                <!-- Start content -->
-                <div class="content">
-                    <div class="container-fluid">
-                    </div> <!-- container -->
-
-                </div> <!-- content -->
-                <div class="container-fluid">
-                    <main role="main" class="pb-3">
-                        @RenderBody()
-                    </main>
-                </div>
-                <footer class="footer text-right">
-                    2016 - 2019 © Adminto. Coderthemes.com
-                </footer>
-
-            </div>
-
-
-            <!-- ============================================================== -->
-            <!-- End Right content here -->
-            <!-- ============================================================== -->
-            <!-- Right Sidebar -->
-            <div class="side-bar right-bar">
-                <a href="javascript:void(0);" class="right-bar-toggle">
-                    <i class="mdi mdi-close-circle-outline"></i>
-                </a>
-                <h4 class="">Notifications</h4>
-                <div class="notification-list nicescroll">
-                    <ul class="list-group list-no-border user-list">
-                    </ul>
-                </div>
-            </div>
-            <!-- /Right-bar -->
-
 
         </div>
-        <script src="~/admin/assets/js/jquery.min.js"></script>
-        <script src="~/admin/assets/js/popper.min.js"></script>
-        <script src="~/admin/assets/js/bootstrap.min.js"></script>
-        <script src="~/admin/assets/js/detect.js"></script>
-        <script src="~/admin/assets/js/fastclick.js"></script>
-        <script src="~/admin/assets/js/jquery.blockui.js"></script>
-        <script src="~/admin/assets/js/waves.js"></script>
-        <script src="~/admin/assets/js/jquery.nicescroll.js"></script>
-        <script src="~/admin/assets/js/jquery.slimscroll.js"></script>
-        <script src="~/admin/assets/js/jquery.scrollto.min.js"></script>
-        <script src="~/admin/assets/plugins/jquery-knob/jquery.knob.js"></script>
-        <script src="~/admin/assets/plugins/morris/morris.min.js"></script>
-        <script src="~/admin/assets/plugins/raphael/raphael-min.js"></script>
-        <script src="~/admin/assets/js/chart.js"></script>
-        <script src="~/admin/assets/js/sweetalert2@11.js"></script>
-        <script src="~/admin/assets/js/datatables.min.js"></script>
-        <script src="~/admin/assets/js/jquery.core.js"></script>
-        <script src="~/admin/assets/js/jquery.app.js"></script>
-        <script src="~/admin/assets/js/bootstrap.min.js"></script>
-        <script src="~/admin/assets/js/bootstrap.bundle.min.js"></script>
-        @await RenderSectionAsync("Scripts", required: false)
-    </body>
-    </html>
+        <!-- Left Sidebar End -->
+        <!-- ============================================================== -->
+        <!-- Start right Content here -->
+        <!-- ============================================================== -->
+        <div class="content-page">
+            <!-- Start content -->
+            <div class="content">
+                <div class="container-fluid">
+                </div> <!-- container -->
+
+            </div> <!-- content -->
+            <div class="container-fluid">
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                </main>
+            </div>
+            <footer class="footer text-right">
+                2016 - 2019 © Adminto. Coderthemes.com
+            </footer>
+
+        </div>
+        <!-- ============================================================== -->
+        <!-- End Right content here -->
+        <!-- ============================================================== -->
+        <!-- Right Sidebar -->
+        <div class="side-bar right-bar">
+            <a href="javascript:void(0);" class="right-bar-toggle">
+                <i class="mdi mdi-close-circle-outline"></i>
+            </a>
+            <h4 class="">Notifications</h4>
+            <div class="notification-list nicescroll">
+                <ul class="list-group list-no-border user-list">
+                </ul>
+            </div>
+        </div>
+        <!-- /Right-bar -->
+
+    </div>
+
+    <script src="~/admin/assets/js/jquery.min.js"></script>
+    <script src="~/admin/assets/js/popper.min.js"></script>
+    <script src="~/admin/assets/js/bootstrap.min.js"></script>
+    <script src="~/admin/assets/js/detect.js"></script>
+    <script src="~/admin/assets/js/fastclick.js"></script>
+    <script src="~/admin/assets/js/jquery.blockui.js"></script>
+    <script src="~/admin/assets/js/waves.js"></script>
+    <script src="~/admin/assets/js/jquery.nicescroll.js"></script>
+    <script src="~/admin/assets/js/jquery.slimscroll.js"></script>
+    <script src="~/admin/assets/js/jquery.scrollto.min.js"></script>
+    <script src="~/admin/assets/js/sweetalert2@11.js"></script>
+    <script src="~/admin/assets/js/datatables.min.js"></script>
+    <script src="~/admin/assets/js/jquery.core.js"></script>
+    <script src="~/admin/assets/js/jquery.app.js"></script>
+    <script src="~/admin/assets/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

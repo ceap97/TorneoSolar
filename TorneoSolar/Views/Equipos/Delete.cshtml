@@ -1,39 +1,40 @@
 ﻿@model TorneoSolar.Models.Equipo
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Eliminar Equipo";
+    Layout = "~/Views/Shared/_Admin.cshtml";
 }
 
-<h1>Delete</h1>
-
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Equipo</h4>
+<div class="container mt-4">
+    <h2 class="text-primary">🗑️ Eliminar Equipo</h2>
     <hr />
+    <h3>¿Está seguro que desea eliminar este equipo?</h3>
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Nombre)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Nombre)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Ciudad)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Ciudad)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Logo)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Logo)
+        <dd class="col-sm-9">
+            <img src="@Model.Logo" alt="Logo de @Model.Nombre" class="img-thumbnail" style="max-width: 100px;" />
         </dd>
     </dl>
-    
     <form asp-action="Delete">
         <input type="hidden" asp-for="EquipoId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+        <div class="form-group">
+            <input type="submit" value="Eliminar" class="btn btn-danger" />
+            <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+        </div>
     </form>
 </div>
+
