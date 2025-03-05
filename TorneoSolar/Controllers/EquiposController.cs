@@ -28,10 +28,6 @@ namespace TorneoSolar.Controllers
         {
             return View(await _context.Equipos.ToListAsync());
         }
-        public async Task<IActionResult> Listado()
-        {
-            return View(await _context.Equipos.ToListAsync());
-        }
 
         // GET: Equipos/Details/5
         public async Task<IActionResult> Details(int? id)

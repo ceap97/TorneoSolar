@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TorneoSolar.Models;
+using TorneoSolar.Recursos;
 
 namespace TorneoSolar.Controllers
 {
@@ -61,6 +62,7 @@ namespace TorneoSolar.Controllers
         {
             if (ModelState.IsValid)
             {
+                usuario.Clave = Utilidades.EncriptarClave(usuario.Clave);
                 _context.Add(usuario);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
