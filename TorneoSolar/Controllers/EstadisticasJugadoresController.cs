@@ -18,6 +18,49 @@ namespace TorneoSolar.Controllers
             _context = context;
         }
 
+        [HttpGet]
+        public async Task<JsonResult> GetJugadoresPorPartido(int partidoId)
+        {
+            var partido = await _context.Partidos
+                .Include(p => p.LocalEquipo)
+                .Include(p => p.VisitanteEquipo)
+                .FirstOrDefaultAsync(p => p.PartidoId == partidoId);
+
+            if (partido == null)
+            {
+                return Json(new { success = false, message = "Partido no encontrado" });
+            }
+
+            var jugadores = await _context.Jugadores
+                .Where(j => j.EquipoId == partido.LocalEquipoId || j.EquipoId == partido.VisitanteEquipoId)
+                .Select(j => new { j.JugadorId, j.Nombre })
+                .ToListAsync();
+
+            return Json(new { success = true, jugadores });
+        }
+
+
+        //[HttpGet]
+        //public async Task<JsonResult> GetJugadoresPorPartido(int partidoId)
+        //{
+        //    var partido = await _context.Partidos
+        //        .Include(p => p.LocalEquipo)
+        //        .Include(p => p.VisitanteEquipo)
+        //        .FirstOrDefaultAsync(p => p.PartidoId == partidoId);
+
+        //    if (partido == null)
+        //    {
+        //        return Json(new { success = false, message = "Partido no encontrado" });
+        //    }
+
+        //    var jugadores = await _context.Jugadores
+        //        .Where(j => j.EquipoId == partido.LocalEquipoId || j.EquipoId == partido.VisitanteEquipoId)
+        //        .Select(j => new { j.JugadorId, j.Nombre })
+        //        .ToListAsync();
+
+        //    return Json(jugadores);
+        //}
+
         // GET: EstadisticasJugadores
         public async Task<IActionResult> Index()
         {
@@ -53,10 +96,20 @@ namespace TorneoSolar.Controllers
         // GET: EstadisticasJugadores/Create
         public IActionResult Create()
         {
-            ViewData["JugadorId"] = new SelectList(_context.Jugadores, "JugadorId", "JugadorId");
-            ViewData["PartidoId"] = new SelectList(_context.Partidos, "PartidoId", "PartidoId");
+            ViewData["PartidoId"] = new SelectList(_context.Partidos
+                .Include(p => p.LocalEquipo)
+                .Include(p => p.VisitanteEquipo)
+                .Select(p => new
+                {
+                    p.PartidoId,
+                    NombrePartido = $"{p.LocalEquipo.Nombre} vs {p.VisitanteEquipo.Nombre} - {p.FechaHora}"
+                }), "PartidoId", "NombrePartido");
+
+            ViewData["JugadorId"] = new SelectList(Enumerable.Empty<SelectListItem>(), "JugadorId", "Nombre");
+
             return View();
         }
+
 
         // POST: EstadisticasJugadores/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
