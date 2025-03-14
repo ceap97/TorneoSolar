@@ -14,14 +14,12 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="EstadisticaId" />
                 <div class="form-group mb-3">
-                    <label asp-for="JugadorId" class="form-label">Jugador</label>
-                    <select asp-for="JugadorId" class="form-select" asp-items="ViewBag.JugadorId"></select>
-                    <span asp-validation-for="JugadorId" class="text-danger"></span>
+                    <label asp-for="PartidoId" class="form-label">Partido</label>
+                    <select asp-for="PartidoId" class="form-select" asp-items="ViewBag.PartidoId" id="partidoSelect"></select>
                 </div>
                 <div class="form-group mb-3">
-                    <label asp-for="PartidoId" class="form-label">Partido</label>
-                    <select asp-for="PartidoId" class="form-select" asp-items="ViewBag.PartidoId"></select>
-                    <span asp-validation-for="PartidoId" class="text-danger"></span>
+                    <label asp-for="JugadorId" class="form-label">Jugador</label>
+                    <select asp-for="JugadorId" class="form-select" asp-items="ViewBag.JugadorId" id="jugadorSelect"></select>
                 </div>
                 <div class="form-group mb-3">
                     <label asp-for="Puntos" class="form-label">Puntos</label>
@@ -66,9 +64,31 @@
 </div>
 
 @section Scripts {
+    <script>
+        document.getElementById('partidoSelect').addEventListener('change', function () {
+            var partidoId = this.value;
+            var jugadorSelect = document.getElementById('jugadorSelect');
+            jugadorSelect.innerHTML = '';
+
+            if (partidoId) {
+                fetch(`/EstadisticasJugadores/GetJugadoresPorPartido?partidoId=${partidoId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success === false) {
+                            alert(data.message);
+                        } else {
+                            data.jugadores.forEach(jugador => {
+                                var option = document.createElement('option');
+                                option.value = jugador.jugadorId;
+                                option.text = jugador.nombre;
+                                jugadorSelect.appendChild(option);
+                            });
+                        }
+                    });
+            }
+        });
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
-
-

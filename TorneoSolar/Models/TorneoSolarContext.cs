@@ -127,4 +127,6 @@ public DbSet<TorneoSolar.Models.TablaPosiciones> TablaPosiciones { get; set; } =
 
 public DbSet<TorneoSolar.Models.Noticias> Noticias { get; set; }
 
+public DbSet<TorneoSolar.Models.TablaPosicionesFem> TablaPosicionesFem { get; set; }
+
 }

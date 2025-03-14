@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,8 @@ using TorneoSolar.Models;
 
 namespace TorneoSolar.Controllers
 {
+    [Authorize]
+
     public class EstadisticasJugadoresController : Controller
     {
         private readonly TorneoSolarContext _context;
@@ -38,28 +41,6 @@ namespace TorneoSolar.Controllers
 
             return Json(new { success = true, jugadores });
         }
-
-
-        //[HttpGet]
-        //public async Task<JsonResult> GetJugadoresPorPartido(int partidoId)
-        //{
-        //    var partido = await _context.Partidos
-        //        .Include(p => p.LocalEquipo)
-        //        .Include(p => p.VisitanteEquipo)
-        //        .FirstOrDefaultAsync(p => p.PartidoId == partidoId);
-
-        //    if (partido == null)
-        //    {
-        //        return Json(new { success = false, message = "Partido no encontrado" });
-        //    }
-
-        //    var jugadores = await _context.Jugadores
-        //        .Where(j => j.EquipoId == partido.LocalEquipoId || j.EquipoId == partido.VisitanteEquipoId)
-        //        .Select(j => new { j.JugadorId, j.Nombre })
-        //        .ToListAsync();
-
-        //    return Json(jugadores);
-        //}
 
         // GET: EstadisticasJugadores
         public async Task<IActionResult> Index()

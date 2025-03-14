@@ -13,8 +13,8 @@
             <form asp-action="Create">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group mb-3">
-                    <label asp-for="PartidoId" class="form-label"></label>
-                    <select asp-for="PartidoId" class="form-select" asp-items="ViewBag.PartidoId"></select>
+                    <label asp-for="PartidoId" class="form-label">Partido</label>
+                    <select asp-for="PartidoId" class="form-select" asp-items="ViewBag.PartidoId" id="partidoSelect"></select>
                 </div>
                 <div class="form-group mb-3">
                     <label asp-for="PuntosLocal" class="form-label"></label>
@@ -38,6 +38,23 @@
 </div>
 
 @section Scripts {
+    <script>
+        document.getElementById('partidoSelect').addEventListener('change', function () {
+            var partidoId = this.value;
+            if (partidoId) {
+                fetch(`/ResultadosPartidos/GetDetallesPartido?partidoId=${partidoId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success === false) {
+                            alert(data.message);
+                        } else {
+                            // Aquí puedes actualizar el DOM con los detalles del partido
+                            console.log(data);
+                        }
+                    });
+            }
+        });
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

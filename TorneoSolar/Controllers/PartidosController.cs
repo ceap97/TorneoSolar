@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -30,22 +31,25 @@ namespace TorneoSolar.Controllers
             return PartialView("_UltimosResultados", ultimosResultados);
         }
 
-        // GET: Partidos
         public async Task<IActionResult> Index()
         {
             var partidosConResultados = _context.Partidos
                 .Include(p => p.LocalEquipo)
                 .Include(p => p.VisitanteEquipo)
-                .Include(p => p.ResultadosPartido);  // Incluir el resultado de cada partido
+                .Include(p => p.ResultadosPartido)
+                .OrderBy(p => p.FechaHora); // Ordenar por FechaHora
 
             return View(await partidosConResultados.ToListAsync());
         }
+
+        [Authorize]
 
         public async Task<IActionResult> Index1()
         {
             var torneoSolarContext = _context.Partidos.Include(p => p.LocalEquipo).Include(p => p.VisitanteEquipo);
             return View(await torneoSolarContext.ToListAsync());
         }
+        [Authorize]
 
         // GET: Partidos/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -66,6 +70,7 @@ namespace TorneoSolar.Controllers
 
             return View(partido);
         }
+        [Authorize]
 
         // GET: Partidos/Create
         public IActionResult Create()
@@ -74,6 +79,7 @@ namespace TorneoSolar.Controllers
             ViewData["VisitanteEquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre");
             return View();
         }
+        [Authorize]
 
         // POST: Partidos/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -92,6 +98,7 @@ namespace TorneoSolar.Controllers
             ViewData["VisitanteEquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre", partido.VisitanteEquipoId);
             return View(partido);
         }
+        [Authorize]
 
         // GET: Partidos/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -110,6 +117,7 @@ namespace TorneoSolar.Controllers
             ViewData["VisitanteEquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre", partido.VisitanteEquipoId);
             return View(partido);
         }
+        [Authorize]
 
         // POST: Partidos/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -149,6 +157,8 @@ namespace TorneoSolar.Controllers
         }
 
         // GET: Partidos/Delete/5
+        [Authorize]
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -167,6 +177,7 @@ namespace TorneoSolar.Controllers
 
             return View(partido);
         }
+        [Authorize]
 
         // POST: Partidos/Delete/5
         [HttpPost, ActionName("Delete")]

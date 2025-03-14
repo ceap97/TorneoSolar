@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -18,16 +19,17 @@ namespace TorneoSolar.Controllers
         {
             _context = context;
         }
-
         // GET: Equipos
         public async Task<IActionResult> Index()
         {
             return View(await _context.Equipos.ToListAsync());
         }
+        [Authorize]
         public async Task<IActionResult> Index1()
         {
             return View(await _context.Equipos.ToListAsync());
         }
+        [Authorize]
 
         // GET: Equipos/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -46,12 +48,14 @@ namespace TorneoSolar.Controllers
 
             return View(equipo);
         }
+        [Authorize]
 
         // GET: Equipos/Create
         public IActionResult Create()
         {
             return View();
         }
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("EquipoId,Nombre,Ciudad,Logo")] Equipo equipo, IFormFile logo)
@@ -96,7 +100,7 @@ namespace TorneoSolar.Controllers
         }
 
 
-
+        [Authorize]
         // GET: Equipos/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -116,6 +120,7 @@ namespace TorneoSolar.Controllers
         // POST: Equipos/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("EquipoId,Nombre,Ciudad,Logo")] Equipo equipo)
@@ -147,6 +152,7 @@ namespace TorneoSolar.Controllers
             }
             return View(equipo);
         }
+        [Authorize]
 
         // GET: Equipos/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -165,6 +171,7 @@ namespace TorneoSolar.Controllers
 
             return View(equipo);
         }
+        [Authorize]
 
         // POST: Equipos/Delete/5
         [HttpPost, ActionName("Delete")]

@@ -5,6 +5,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TorneoSolar.Controllers
 {
@@ -15,10 +16,12 @@ namespace TorneoSolar.Controllers
         {
             _usuariosServicio = usuariosServicio;
         }
+        [Authorize]
         public IActionResult Registrarse()
         {
             return View();
         }
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Registrarse(Usuario modelo)
         {

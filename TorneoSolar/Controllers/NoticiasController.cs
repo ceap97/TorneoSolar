@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,8 @@ using TorneoSolar.Models;
 
 namespace TorneoSolar.Controllers
 {
+    [Authorize]
+
     public class NoticiasController : Controller
     {
         private readonly TorneoSolarContext _context;

@@ -10,11 +10,11 @@ using TorneoSolar.Models;
 
 namespace TorneoSolar.Controllers
 {
-    public class TablaPosicionesController : Controller
+    public class TablaPosicionesFemController : Controller
     {
         private readonly TorneoSolarContext _context;
 
-        public TablaPosicionesController(TorneoSolarContext context)
+        public TablaPosicionesFemController(TorneoSolarContext context)
         {
             _context = context;
         }
@@ -22,13 +22,13 @@ namespace TorneoSolar.Controllers
         // GET: TablaPosicioness
         public async Task<IActionResult> Index()
         {
-            var torneoSolarContext = _context.TablaPosiciones.Include(t => t.Equipo);
+            var torneoSolarContext = _context.TablaPosicionesFem.Include(t => t.Equipo);
             return View(await torneoSolarContext.ToListAsync());
         }
         [Authorize]
         public async Task<IActionResult> Index1()
         {
-            var torneoSolarContext = _context.TablaPosiciones.Include(t => t.Equipo);
+            var torneoSolarContext = _context.TablaPosicionesFem.Include(t => t.Equipo);
             return View(await torneoSolarContext.ToListAsync());
         }
         [Authorize]
@@ -41,17 +41,19 @@ namespace TorneoSolar.Controllers
                 return NotFound();
             }
 
-            var TablaPosiciones = await _context.TablaPosiciones
+            var TablaPosicionesFem = await _context.TablaPosicionesFem
                 .Include(t => t.Equipo)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (TablaPosiciones == null)
+            if (TablaPosicionesFem == null)
             {
                 return NotFound();
             }
 
-            return View(TablaPosiciones);
+            return View(TablaPosicionesFem);
         }
+
         [Authorize]
+
 
         // GET: TablaPosicioness/Create
         public IActionResult Create()
@@ -59,21 +61,22 @@ namespace TorneoSolar.Controllers
             ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre");
             return View();
         }
+
         [Authorize]
 
         // POST: TablaPosicioness/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,EquipoId,PJ,PG,PP,Puntos,PtsFavor,PtsContra")] TablaPosiciones TablaPosiciones)
+        public async Task<IActionResult> Create([Bind("Id,EquipoId,PJ,PG,PP,Puntos,PtsFavor,PtsContra")] TablaPosicionesFem TablaPosicionesFem)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(TablaPosiciones);
+                _context.Add(TablaPosicionesFem);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre", TablaPosiciones.EquipoId);
-            return View(TablaPosiciones);
+            ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre", TablaPosicionesFem.EquipoId);
+            return View(TablaPosicionesFem);
         }
 
 
@@ -87,13 +90,13 @@ namespace TorneoSolar.Controllers
                 return NotFound();
             }
 
-            var TablaPosiciones = await _context.TablaPosiciones.FindAsync(id);
-            if (TablaPosiciones == null)
+            var TablaPosicionesFem = await _context.TablaPosicionesFem.FindAsync(id);
+            if (TablaPosicionesFem == null)
             {
                 return NotFound();
             }
-            ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "EquipoId", TablaPosiciones.EquipoId);
-            return View(TablaPosiciones);
+            ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "EquipoId", TablaPosicionesFem.EquipoId);
+            return View(TablaPosicionesFem);
         }
         [Authorize]
 
@@ -102,9 +105,9 @@ namespace TorneoSolar.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,EquipoId,PJ,PG,PP,Puntos,PtsFavor,PtsContra")] TablaPosiciones TablaPosiciones)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,EquipoId,PJ,PG,PP,Puntos,PtsFavor,PtsContra")] TablaPosicionesFem TablaPosicionesFem)
         {
-            if (id != TablaPosiciones.Id)
+            if (id != TablaPosicionesFem.Id)
             {
                 return NotFound();
             }
@@ -113,12 +116,12 @@ namespace TorneoSolar.Controllers
             {
                 try
                 {
-                    _context.Update(TablaPosiciones);
+                    _context.Update(TablaPosicionesFem);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TablaPosicionesExists(TablaPosiciones.Id))
+                    if (!TablaPosicionesExists(TablaPosicionesFem.Id))
                     {
                         return NotFound();
                     }
@@ -129,10 +132,12 @@ namespace TorneoSolar.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "EquipoId", TablaPosiciones.EquipoId);
-            return View(TablaPosiciones);
+            ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "EquipoId", TablaPosicionesFem.EquipoId);
+            return View(TablaPosicionesFem);
         }
+
         [Authorize]
+
         // GET: TablaPosicioness/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -141,15 +146,15 @@ namespace TorneoSolar.Controllers
                 return NotFound();
             }
 
-            var TablaPosiciones = await _context.TablaPosiciones
+            var TablaPosicionesFem = await _context.TablaPosicionesFem
                 .Include(t => t.Equipo)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (TablaPosiciones == null)
+            if (TablaPosicionesFem == null)
             {
                 return NotFound();
             }
 
-            return View(TablaPosiciones);
+            return View(TablaPosicionesFem);
         }
         [Authorize]
 
@@ -158,10 +163,10 @@ namespace TorneoSolar.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var TablaPosiciones = await _context.TablaPosiciones.FindAsync(id);
-            if (TablaPosiciones != null)
+            var TablaPosicionesFem = await _context.TablaPosicionesFem.FindAsync(id);
+            if (TablaPosicionesFem != null)
             {
-                _context.TablaPosiciones.Remove(TablaPosiciones);
+                _context.TablaPosicionesFem.Remove(TablaPosicionesFem);
             }
 
             await _context.SaveChangesAsync();
@@ -170,7 +175,7 @@ namespace TorneoSolar.Controllers
 
         private bool TablaPosicionesExists(int id)
         {
-            return _context.TablaPosiciones.Any(e => e.Id == id);
+            return _context.TablaPosicionesFem.Any(e => e.Id == id);
         }
     }
 }

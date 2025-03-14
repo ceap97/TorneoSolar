@@ -1,0 +1,48 @@
+﻿@model IEnumerable<TorneoSolar.Models.TablaPosicionesFem>
+
+@{
+    ViewData["Title"] = "Tabla de Posiciones";
+}
+
+<h2 class="text-center">Tabla de Posiciones</h2>
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered text-center">
+        <thead class="table-dark">
+            <tr>
+                <th>Pos</th>
+                <th>Equipo</th>
+                <th>PJ</th>
+                <th>PG</th>
+                <th>PP</th>
+                <th>Puntos</th>
+                <th>Pts a Favor</th>
+                <th>Pts en Contra</th>
+                <th>DIF</th>
+                <th>% Victorias</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var posicion = 1;
+            }
+            @foreach (var item in Model.OrderByDescending(x => x.Puntos))
+            {
+                <tr>
+                    <td>@posicion</td>
+                    <td>@item.Equipo.Nombre</td>
+                    <td>@item.PJ</td>
+                    <td>@item.PG</td>
+                    <td>@item.PP</td>
+                    <td>@item.Puntos</td>
+                    <td>@item.PtsFavor</td>
+                    <td>@item.PtsContra</td>
+                    <td>@(item.PtsFavor - item.PtsContra)</td>
+                    <td>@((item.PG * 1.0 / item.PJ).ToString("P1"))</td>
+                </tr>
+                posicion++;
+            }
+        </tbody>
+    </table>
+</div>
+

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -32,6 +33,8 @@ namespace TorneoSolar.Controllers
 
             return View(jugadores.ToList());
         }
+        [Authorize]
+
         public async Task<IActionResult> Index1()
         {
             var torneoSolarContext = _context.Jugadores.Include(j => j.Equipo);
@@ -79,6 +82,7 @@ namespace TorneoSolar.Controllers
             });
         }
 
+        [Authorize]
 
         // GET: Jugadores/Create
         public IActionResult Create()
@@ -86,6 +90,7 @@ namespace TorneoSolar.Controllers
             ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre");
             return View();
         }
+        [Authorize]
 
         // POST: Jugadores/Create
         [HttpPost]
@@ -132,6 +137,7 @@ namespace TorneoSolar.Controllers
                 return View(jugadore);
             }
         }
+        [Authorize]
 
         public async Task<IActionResult> Edit(int? id)
         {
@@ -148,6 +154,7 @@ namespace TorneoSolar.Controllers
             ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "EquipoId", jugadore.EquipoId);
             return View(jugadore);
         }
+        [Authorize]
 
         // POST: Jugadores1/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -184,6 +191,7 @@ namespace TorneoSolar.Controllers
             ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "EquipoId", jugadore.EquipoId);
             return View(jugadore);
         }
+        [Authorize]
 
         // GET: Jugadores/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -203,6 +211,7 @@ namespace TorneoSolar.Controllers
 
             return View(jugadore);
         }
+        [Authorize]
 
         // POST: Jugadores/Delete/5
         [HttpPost, ActionName("Delete")]
