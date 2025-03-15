@@ -116,14 +116,10 @@ namespace TorneoSolar.Controllers
             }
             return View(equipo);
         }
-
-        // POST: Equipos/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EquipoId,Nombre,Ciudad,Logo")] Equipo equipo)
+        public async Task<IActionResult> Edit(int id, [Bind("EquipoId,Nombre,Ciudad,Logo")] Equipo equipo, IFormFile logo)
         {
             if (id != equipo.EquipoId)
             {
@@ -134,6 +130,26 @@ namespace TorneoSolar.Controllers
             {
                 try
                 {
+                    if (logo != null)
+                    {
+                        var fileName = $"{equipo.Nombre}.jpeg";  // Usar el nombre del equipo como nombre del archivo
+                        var filePath = Path.Combine(_uploadPath, fileName);
+
+                        // Crear el directorio si no existe
+                        if (!Directory.Exists(_uploadPath))
+                        {
+                            Directory.CreateDirectory(_uploadPath);
+                        }
+
+                        // Guardar la imagen en el servidor
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await logo.CopyToAsync(stream);
+                        }
+
+                        equipo.Logo = $"/images/equipos/{fileName}";  // Guardar la ruta relativa en la base de datos
+                    }
+
                     _context.Update(equipo);
                     await _context.SaveChangesAsync();
                 }
@@ -152,6 +168,7 @@ namespace TorneoSolar.Controllers
             }
             return View(equipo);
         }
+
         [Authorize]
 
         // GET: Equipos/Delete/5
