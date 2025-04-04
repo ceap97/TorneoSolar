@@ -124,7 +124,7 @@ namespace TorneoSolar.Controllers
 
                     _context.Add(jugadore);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index1));
                 }
                 ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre", jugadore.EquipoId);
                 return View(jugadore);
@@ -186,7 +186,7 @@ namespace TorneoSolar.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index1));
             }
             ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "EquipoId", jugadore.EquipoId);
             return View(jugadore);
@@ -225,7 +225,7 @@ namespace TorneoSolar.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index1));
         }
 
         private bool JugadoreExists(int id)

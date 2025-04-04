@@ -92,7 +92,7 @@ namespace TorneoSolar.Controllers
             {
                 _context.Add(partido);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index1));
             }
             ViewData["LocalEquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre", partido.LocalEquipoId);
             ViewData["VisitanteEquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre", partido.VisitanteEquipoId);
@@ -149,7 +149,7 @@ namespace TorneoSolar.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index1));
             }
             ViewData["LocalEquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre", partido.LocalEquipoId);
             ViewData["VisitanteEquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre", partido.VisitanteEquipoId);
@@ -191,7 +191,7 @@ namespace TorneoSolar.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index1));
         }
 
         private bool PartidoExists(int id)

@@ -70,7 +70,7 @@ namespace TorneoSolar.Controllers
             {
                 _context.Add(TablaPosiciones);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index1));
             }
             ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre", TablaPosiciones.EquipoId);
             return View(TablaPosiciones);
@@ -127,7 +127,7 @@ namespace TorneoSolar.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index1));
             }
             ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "EquipoId", TablaPosiciones.EquipoId);
             return View(TablaPosiciones);
@@ -165,7 +165,7 @@ namespace TorneoSolar.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index1));
         }
 
         private bool TablaPosicionesExists(int id)

@@ -83,7 +83,7 @@ namespace TorneoSolar.Controllers
 
                     _context.Add(equipo);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index1));
                 }
                 return View(equipo);
             }
@@ -164,7 +164,7 @@ namespace TorneoSolar.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index1));
             }
             return View(equipo);
         }
@@ -202,7 +202,7 @@ namespace TorneoSolar.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index1));
         }
 
         private bool EquipoExists(int id)

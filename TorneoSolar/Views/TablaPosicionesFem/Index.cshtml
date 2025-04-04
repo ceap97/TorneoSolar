@@ -26,7 +26,7 @@
             @{
                 var posicion = 1;
             }
-            @foreach (var item in Model.OrderByDescending(x => x.Puntos))
+            @foreach (var item in Model.OrderByDescending(x => x.PtsFavor - x.PtsContra))
             {
                 <tr>
                     <td>@posicion</td>

@@ -128,6 +128,92 @@ namespace TorneoSolar.Controllers
             _context.Update(equipoVisitante);
             await _context.SaveChangesAsync();
         }
+        private async Task RevertirTablaPosicionesFem(ResultadosPartido resultadosPartido)
+        {
+            var partido = await _context.Partidos
+                .Include(p => p.LocalEquipo)
+                .Include(p => p.VisitanteEquipo)
+                .FirstOrDefaultAsync(p => p.PartidoId == resultadosPartido.PartidoId);
+
+            if (partido == null) return;
+
+            var equipoLocal = await _context.TablaPosicionesFem.FirstOrDefaultAsync(tp => tp.EquipoId == partido.LocalEquipoId);
+            var equipoVisitante = await _context.TablaPosicionesFem.FirstOrDefaultAsync(tp => tp.EquipoId == partido.VisitanteEquipoId);
+
+            if (equipoLocal == null || equipoVisitante == null) return;
+
+            equipoLocal.PJ--;
+            equipoVisitante.PJ--;
+
+            equipoLocal.PtsFavor -= resultadosPartido.PuntosLocal;
+            equipoLocal.PtsContra -= resultadosPartido.PuntosVisitante;
+
+            equipoVisitante.PtsFavor -= resultadosPartido.PuntosVisitante;
+            equipoVisitante.PtsContra -= resultadosPartido.PuntosLocal;
+
+            if (resultadosPartido.PuntosLocal > resultadosPartido.PuntosVisitante)
+            {
+                equipoLocal.PG--;
+                equipoLocal.Puntos -= 2;
+                equipoVisitante.PP--;
+            }
+            else if (resultadosPartido.PuntosLocal < resultadosPartido.PuntosVisitante)
+            {
+                equipoVisitante.PG--;
+                equipoVisitante.Puntos -= 2;
+                equipoLocal.PP--;
+            }
+
+            equipoLocal.Diferencia = equipoLocal.PtsFavor - equipoLocal.PtsContra;
+            equipoVisitante.Diferencia = equipoVisitante.PtsFavor - equipoVisitante.PtsContra;
+
+            _context.Update(equipoLocal);
+            _context.Update(equipoVisitante);
+            await _context.SaveChangesAsync();
+        }
+        private async Task ActualizarTablaPosicionesFem(ResultadosPartido resultadosPartido)
+        {
+            var partido = await _context.Partidos
+                .Include(p => p.LocalEquipo)
+                .Include(p => p.VisitanteEquipo)
+                .FirstOrDefaultAsync(p => p.PartidoId == resultadosPartido.PartidoId);
+
+            if (partido == null) return;
+
+            var equipoLocal = await _context.TablaPosicionesFem.FirstOrDefaultAsync(tp => tp.EquipoId == partido.LocalEquipoId);
+            var equipoVisitante = await _context.TablaPosicionesFem.FirstOrDefaultAsync(tp => tp.EquipoId == partido.VisitanteEquipoId);
+
+            if (equipoLocal == null || equipoVisitante == null) return;
+
+            equipoLocal.PJ++;
+            equipoVisitante.PJ++;
+
+            equipoLocal.PtsFavor += resultadosPartido.PuntosLocal;
+            equipoLocal.PtsContra += resultadosPartido.PuntosVisitante;
+
+            equipoVisitante.PtsFavor += resultadosPartido.PuntosVisitante;
+            equipoVisitante.PtsContra += resultadosPartido.PuntosLocal;
+
+            if (resultadosPartido.PuntosLocal > resultadosPartido.PuntosVisitante)
+            {
+                equipoLocal.PG++;
+                equipoLocal.Puntos += 2;
+                equipoVisitante.PP++;
+            }
+            else if (resultadosPartido.PuntosLocal < resultadosPartido.PuntosVisitante)
+            {
+                equipoVisitante.PG++;
+                equipoVisitante.Puntos += 2;
+                equipoLocal.PP++;
+            }
+
+            equipoLocal.Diferencia = equipoLocal.PtsFavor - equipoLocal.PtsContra;
+            equipoVisitante.Diferencia = equipoVisitante.PtsFavor - equipoVisitante.PtsContra;
+
+            _context.Update(equipoLocal);
+            _context.Update(equipoVisitante);
+            await _context.SaveChangesAsync();
+        }
 
         // GET: ResultadosPartidos
         public async Task<IActionResult> Index()
@@ -191,7 +277,8 @@ namespace TorneoSolar.Controllers
                 _context.Add(resultadosPartido);
                 await _context.SaveChangesAsync();
                 await ActualizarTablaPosiciones(resultadosPartido);
-                return RedirectToAction(nameof(Index));
+                await ActualizarTablaPosicionesFem(resultadosPartido);
+                return RedirectToAction(nameof(Index1));
             }
             ViewData["PartidoId"] = new SelectList(_context.Partidos, "PartidoId", "PartidoId", resultadosPartido.PartidoId);
             return View(resultadosPartido);
@@ -241,6 +328,7 @@ namespace TorneoSolar.Controllers
                     _context.Update(resultadosPartido);
                     await _context.SaveChangesAsync();
                     await ActualizarTablaPosiciones(resultadosPartido);
+                    await ActualizarTablaPosicionesFem(resultadosPartido);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -253,7 +341,7 @@ namespace TorneoSolar.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index1));
             }
             ViewData["PartidoId"] = new SelectList(_context.Partidos, "PartidoId", "PartidoId", resultadosPartido.PartidoId);
             return View(resultadosPartido);
@@ -290,10 +378,11 @@ namespace TorneoSolar.Controllers
             if (resultadosPartido != null)
             {
                 await RevertirTablaPosiciones(resultadosPartido);
+                await RevertirTablaPosicionesFem(resultadosPartido);
                 _context.ResultadosPartidos.Remove(resultadosPartido);
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index1));
         }
 
         private bool ResultadosPartidoExists(int id)
