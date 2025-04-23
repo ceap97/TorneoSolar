@@ -25,6 +25,7 @@ public partial class TorneoSolarContext : DbContext
     public virtual DbSet<Partido> Partidos { get; set; }
 
     public virtual DbSet<ResultadosPartido> ResultadosPartidos { get; set; }
+    public virtual DbSet<VisitorCount> VisitorCounts { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) { }
 //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -128,5 +129,6 @@ public DbSet<TorneoSolar.Models.TablaPosiciones> TablaPosiciones { get; set; } =
 public DbSet<TorneoSolar.Models.Noticias> Noticias { get; set; }
 
 public DbSet<TorneoSolar.Models.TablaPosicionesFem> TablaPosicionesFem { get; set; }
+public DbSet<TorneoSolar.Models.VisitorCount> VisitorCount { get; set; } = default!;
 
 }

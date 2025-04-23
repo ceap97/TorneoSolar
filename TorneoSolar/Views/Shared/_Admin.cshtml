@@ -1,8 +1,14 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using TorneoSolar.Models
+@inject TorneoSolarContext _context
+
+@using Microsoft.EntityFrameworkCore
+
 @{
     var userName = User.Identity.Name;
     var userImage = Url.Content($"~/images/usuarios/{userName}.jpeg");
     var esEmpleado = User.Claims.Any(c => c.Type == "EmpleadoId" && !string.IsNullOrEmpty(c.Value));
+    var visitorCount = await _context.VisitorCounts.FirstOrDefaultAsync();
 }
 <!DOCTYPE html>
 <html>
@@ -116,34 +122,34 @@
                 <!--- Sidemenu -->
                 <div id="sidebar-menu">
                     <ul>
-                                <li>
-                                    <a asp-controller="Usuarios" asp-action="Index" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Usuarios </span> </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Equipos" asp-action="Index1" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Equipos </span> </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="EstadisticasJugadores" asp-action="Index" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Estadisticas de Jugadores </span> </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Jugadores" asp-action="Index1" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Jugadores </span> </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Partidos" asp-action="Index1" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Partidos </span> </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Noticias" asp-action="Index" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Noticias </span> </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="ResultadosPartidos" asp-action="Index1" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Resultados de Partidos </span> </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="TablaPosiciones" asp-action="Index1" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Tabla de Posiciones </span> </a>
+                        <li>
+                            <a asp-controller="Usuarios" asp-action="Index" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Usuarios </span> </a>
+                        </li>
+                        <li>
+                            <a asp-controller="Equipos" asp-action="Index1" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Equipos </span> </a>
+                        </li>
+                        <li>
+                            <a asp-controller="EstadisticasJugadores" asp-action="Index" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Estadisticas de Jugadores </span> </a>
+                        </li>
+                        <li>
+                            <a asp-controller="Jugadores" asp-action="Index1" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Jugadores </span> </a>
+                        </li>
+                        <li>
+                            <a asp-controller="Partidos" asp-action="Index1" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Partidos </span> </a>
+                        </li>
+                        <li>
+                            <a asp-controller="Noticias" asp-action="Index" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Noticias </span> </a>
+                        </li>
+                        <li>
+                            <a asp-controller="ResultadosPartidos" asp-action="Index1" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Resultados de Partidos </span> </a>
+                        </li>
+                        <li>
+                            <a asp-controller="TablaPosiciones" asp-action="Index1" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Tabla de Posiciones </span> </a>
                         </li>
                         <li>
                             <a asp-controller="TablaPosicionesFem" asp-action="Index1" class="waves-effect"><i class="mdi mdi-account-circle"></i> <span> Tabla de Posiciones Femenino </span> </a>
                         </li>
-                            </ul> 
+                    </ul>
                     <div class="clearfix"></div>
                 </div>
                 <!-- Sidebar -->
@@ -170,6 +176,7 @@
             </div>
             <footer class="footer text-right">
                 2016 - 2019 © Adminto. Coderthemes.com
+                <p>Visitantes: @visitorCount?.Count</p>
             </footer>
 
         </div>

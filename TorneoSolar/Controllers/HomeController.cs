@@ -21,13 +21,22 @@ namespace TorneoSolar.Controllers
 
         public async Task<IActionResult> Index()
         {
+            // Incrementar el contador de visitantes
+            var visitorCount = await _context.VisitorCounts.FirstOrDefaultAsync();
+            if (visitorCount != null)
+            {
+                visitorCount.Count++;
+                _context.Update(visitorCount);
+                await _context.SaveChangesAsync();
+            }
+
             var noticias = await _context.Noticias.ToListAsync();
             var ultimosResultados = await _context.Partidos
                 .Include(p => p.LocalEquipo)
                 .Include(p => p.VisitanteEquipo)
                 .Include(p => p.ResultadosPartido)
                 .OrderByDescending(p => p.FechaHora)
-                .Take(5) // Obtener los últimos 5 resultados
+                .Take(5)
                 .ToListAsync();
 
             var viewModel = new HomeViewModel

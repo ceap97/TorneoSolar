@@ -18,6 +18,28 @@ namespace TorneoSolar.Controllers
         {
             _context = context;
         }
+        [HttpGet]
+        public JsonResult GetVisitantesDisponibles(int localId)
+        {
+            var partidosJugados = _context.Partidos
+                .Where(p => p.LocalEquipoId == localId || p.VisitanteEquipoId == localId)
+                .Select(p => new { p.LocalEquipoId, p.VisitanteEquipoId })
+                .ToList();
+
+            var equiposYaJugados = partidosJugados
+                .SelectMany(p => new[] { p.LocalEquipoId, p.VisitanteEquipoId })
+                .Where(id => id != localId)
+                .Distinct()
+                .ToList();
+
+            var equiposDisponibles = _context.Equipos
+                .Where(e => e.EquipoId != localId && !equiposYaJugados.Contains(e.EquipoId))
+                .Select(e => new { e.EquipoId, e.Nombre })
+                .ToList();
+
+            return Json(equiposDisponibles);
+        }
+
         public async Task<IActionResult> UltimosResultados()
         {
             var ultimosResultados = await _context.Partidos
