@@ -21,6 +21,27 @@ namespace TorneoSolar.Controllers
         [HttpGet]
         public JsonResult GetVisitantesDisponibles(int localId)
         {
+            var equipoLocal = _context.Equipos.FirstOrDefault(e => e.EquipoId == localId);
+
+            if (equipoLocal == null)
+            {
+                return Json(new List<object>());
+            }
+
+            bool esFemenino = equipoLocal.Nombre.Contains("(Femenino)");
+
+            if (esFemenino)
+            {
+                // Si el equipo local es femenino, mostrar solo otros equipos femeninos, sin importar si ya jugaron
+                var visitantesFemeninos = _context.Equipos
+                    .Where(e => e.EquipoId != localId && e.Nombre.Contains("(Femenino)"))
+                    .Select(e => new { e.EquipoId, e.Nombre })
+                    .ToList();
+
+                return Json(visitantesFemeninos);
+            }
+
+            // Si el equipo local no es femenino, excluir equipos femeninos y los ya jugados
             var partidosJugados = _context.Partidos
                 .Where(p => p.LocalEquipoId == localId || p.VisitanteEquipoId == localId)
                 .Select(p => new { p.LocalEquipoId, p.VisitanteEquipoId })
@@ -32,13 +53,17 @@ namespace TorneoSolar.Controllers
                 .Distinct()
                 .ToList();
 
-            var equiposDisponibles = _context.Equipos
-                .Where(e => e.EquipoId != localId && !equiposYaJugados.Contains(e.EquipoId))
+            var visitantesDisponibles = _context.Equipos
+                .Where(e =>
+                    e.EquipoId != localId &&
+                    !e.Nombre.Contains("(Femenino)") && // excluir equipos femeninos
+                    !equiposYaJugados.Contains(e.EquipoId)) // excluir equipos ya enfrentados
                 .Select(e => new { e.EquipoId, e.Nombre })
                 .ToList();
 
-            return Json(equiposDisponibles);
+            return Json(visitantesDisponibles);
         }
+
 
         public async Task<IActionResult> UltimosResultados()
         {
