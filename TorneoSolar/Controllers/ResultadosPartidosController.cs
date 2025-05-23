@@ -252,16 +252,21 @@ namespace TorneoSolar.Controllers
 
         public IActionResult Create()
         {
-            ViewData["PartidoId"] = new SelectList(_context.Partidos
+            var partidosSinResultado = _context.Partidos
                 .Include(p => p.LocalEquipo)
                 .Include(p => p.VisitanteEquipo)
+                .Where(p => !_context.ResultadosPartidos.Any(rp => rp.PartidoId == p.PartidoId))
                 .Select(p => new
                 {
                     p.PartidoId,
                     NombrePartido = $"{p.LocalEquipo.Nombre} vs {p.VisitanteEquipo.Nombre} - {p.FechaHora}"
-                }), "PartidoId", "NombrePartido");
+                })
+                .ToList();
+
+            ViewData["PartidoId"] = new SelectList(partidosSinResultado, "PartidoId", "NombrePartido");
             return View();
         }
+
 
         [Authorize]
 

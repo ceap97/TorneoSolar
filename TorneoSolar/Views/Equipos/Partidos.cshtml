@@ -35,7 +35,12 @@
                                     <td class="text-center">
                                         @if (partido.ResultadosPartido != null)
                                         {
-                                            <span class="badge bg-primary">
+                                            bool esLocal = partido.LocalEquipo?.Nombre == (string)ViewBag.EquipoNombre;
+                                            bool esVisitante = partido.VisitanteEquipo?.Nombre == (string)ViewBag.EquipoNombre;
+                                            int puntosPropios = esLocal ? partido.ResultadosPartido.PuntosLocal : partido.ResultadosPartido.PuntosVisitante;
+                                            int puntosRival = esLocal ? partido.ResultadosPartido.PuntosVisitante : partido.ResultadosPartido.PuntosLocal;
+                                            string badgeColor = puntosPropios > puntosRival ? "bg bg-primary" : "bg bg-danger";
+                                            <span class="badge @badgeColor">
                                                 @partido.ResultadosPartido.PuntosLocal
                                                 -
                                                 @partido.ResultadosPartido.PuntosVisitante
@@ -46,6 +51,7 @@
                                             <span class="text-muted">Pendiente</span>
                                         }
                                     </td>
+
                                     <td class="text-center">@partido.Ubicacion</td>
                                 </tr>
                             }
@@ -53,11 +59,6 @@
                     </table>
                 </div>
             }
-            <div class="text-center mt-4">
-                <a asp-controller="Equipos" asp-action="Index" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> Volver a Equipos
-                </a>
-            </div>
         </div>
     </div>
 </div>

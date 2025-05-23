@@ -10,9 +10,9 @@
     <link rel="icon" href="images/favicon.ico" type="image/x-icon">
     <!-- Stylesheets-->
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Kanit:300,400,500,500i,600,900%7CRoboto:400,900">
-    <link rel="stylesheet" href="css/bootstrap.css">
-    <link rel="stylesheet" href="css/fonts.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="~/css/bootstrap.css">
+    <link rel="stylesheet" href="~/css/fonts.css">
+    <link rel="stylesheet" href="~/css/style.css">
     <style>
         .ie-panel {
             display: none;
@@ -76,7 +76,7 @@
                             <div class="rd-navbar-main-container container">
                                 <!-- RD Navbar Brand-->
                                 <div class="rd-navbar-brand">
-                                    <a href="./"><img class="brand-logo " src="images/Solar.png" alt="" width="95" height="126" /></a>
+                                    <a href="./"><img class="brand-logo " src="~/images/Solar.png" alt="" width="95" height="126" /></a>
                                 </div>
                                 <!-- RD Navbar List-->
                                 <ul class="rd-navbar-list">
@@ -124,8 +124,8 @@
     <!-- Global Mailform Output-->
 <div class="snackbars" id="form-output-global"></div>
     <!-- Javascript-->
-    <script src="js/core.min.js"></script>
-    <script src="js/script.js"></script>
+    <script src="~/js/core.min.js"></script>
+    <script src="~/js/script.js"></script>
     <script src="~/js/sweetalert2@11.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
