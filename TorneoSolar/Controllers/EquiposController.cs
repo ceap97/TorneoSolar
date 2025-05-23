@@ -19,6 +19,22 @@ namespace TorneoSolar.Controllers
         {
             _context = context;
         }
+        public async Task<IActionResult> Partidos(int equipoId)
+        {
+            var partidos = await _context.Partidos
+                .Include(p => p.LocalEquipo)
+                .Include(p => p.VisitanteEquipo)
+                .Include(p => p.ResultadosPartido)
+                .Where(p => p.LocalEquipoId == equipoId || p.VisitanteEquipoId == equipoId)
+                .OrderByDescending(p => p.FechaHora)
+                .ToListAsync();
+
+            var equipo = await _context.Equipos.FindAsync(equipoId);
+            ViewBag.EquipoNombre = equipo?.Nombre ?? "Equipo";
+
+            return View(partidos);
+        }
+
         // GET: Equipos
         public async Task<IActionResult> Index()
         {

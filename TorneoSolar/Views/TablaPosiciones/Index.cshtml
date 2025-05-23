@@ -26,7 +26,9 @@
             @{
                 var posicion = 1;
             }
-            @foreach (var item in Model.OrderByDescending(x => x.PtsFavor - x.PtsContra))
+            @foreach (var item in Model
+            .OrderByDescending(x => (x.PG * 1.0 / x.PJ)) // Ordenar por porcentaje de victorias
+            .ThenByDescending(x => x.PtsFavor - x.PtsContra)) // Luego por diferencia de puntos
             {
                 <tr>
                     <td>@posicion</td>

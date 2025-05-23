@@ -1,0 +1,74 @@
+﻿@model IEnumerable<TorneoSolar.Models.Partido>
+@{
+    ViewData["Title"] = "Partidos de " + (ViewBag.EquipoNombre ?? "Equipo");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <h2 class="text-center mb-4 display-6">Partidos de <span class="text-primary">@ViewBag.EquipoNombre</span></h2>
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info text-center shadow-sm">Este equipo aún no ha jugado partidos.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle shadow-sm">
+                        <thead class="table-dark">
+                            <tr>
+                                <th class="text-center">Fecha</th>
+                                <th class="text-center">Local</th>
+                                <th class="text-center">Visitante</th>
+                                <th class="text-center">Resultado</th>
+                                <th class="text-center">Ubicación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var partido in Model)
+                            {
+                                <tr>
+                                    <td class="text-center">@partido.FechaHora.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td class="text-center fw-bold">@partido.LocalEquipo?.Nombre</td>
+                                    <td class="text-center fw-bold">@partido.VisitanteEquipo?.Nombre</td>
+                                    <td class="text-center">
+                                        @if (partido.ResultadosPartido != null)
+                                        {
+                                            <span class="badge bg-primary">
+                                                @partido.ResultadosPartido.PuntosLocal
+                                                -
+                                                @partido.ResultadosPartido.PuntosVisitante
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Pendiente</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">@partido.Ubicacion</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            <div class="text-center mt-4">
+                <a asp-controller="Equipos" asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver a Equipos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table th, .table td {
+        vertical-align: middle !important;
+    }
+
+    .badge.bg-primary {
+        font-size: 1.1em;
+        padding: 0.5em 1em;
+    }
+</style>

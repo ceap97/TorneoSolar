@@ -18,6 +18,8 @@ namespace TorneoSolar.Controllers
         {
             _context = context;
         }
+
+
         [HttpGet]
         public JsonResult GetVisitantesDisponibles(int localId)
         {
