@@ -4,6 +4,9 @@
     ViewData["Title"] = "Home Page";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<!-- En la sección <head> de tu _Layout.cshtml -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
 
 <!-- Latest News-->
 <section class="section section-md bg-gray-100">
@@ -48,13 +51,45 @@
                                                 <div class="inline-toggle-parent">
                                                     <div class="inline-toggle icon material-icons-share"></div>
                                                     <div class="inline-toggle-element">
-                                                        <ul class="list-inline">
-                                                            <li>Share</li>
-                                                            <li><a class="icon fa-facebook" href="#"></a></li>
-                                                            <li><a class="icon fa-twitter" href="#"></a></li>
-                                                            <li><a class="icon fa-google-plus" href="#"></a></li>
-                                                            <li><a class="icon fa-instagram" href="#"></a></li>
-                                                        </ul>
+                                                            <div class="post-future-footer group-flex group-flex-xs">
+                                                                <a class="button button-gray-outline" href="#">Read more</a>
+                                                                <div class="post-future-share">
+                                                                    <div class="inline-toggle-parent">
+                                                                        <div class="inline-toggle icon material-icons-share"></div>
+                                                                        <div class="inline-toggle-element">
+                                                                            <ul class="list-inline">
+                                                                                <li>Compartir</li>
+                                                                                <!-- Facebook -->
+                                                                                <li>
+                                                                                    <a class="icon fa-facebook"
+                                                                                       href="https://www.facebook.com/sharer/sharer.php?u=@($"{Context.Request.Scheme}://{Context.Request.Host}{Url.Action("Details", "Noticias", new { id = noticia.NoticiasId })}")"
+                                                                                       target="_blank" title="Compartir en Facebook">
+                                                                                        <i class="fab fa-facebook"></i>
+                                                                                    </a>
+                                                                                </li>
+                                                                                <!-- Instagram (copia el enlace) -->
+                                                                                <li>
+                                                                                    <a class="icon fa-instagram"
+                                                                                       href="javascript:void(0);"
+                                                                                       onclick="copiarEnlace('@($"{Context.Request.Scheme}://{Context.Request.Host}{Url.Action("Details", "Noticias", new { id = noticia.NoticiasId })}")')"
+                                                                                       title="Compartir en Instagram">
+                                                                                        <i class="fab fa-instagram"></i>
+                                                                                    </a>
+                                                                                </li>
+                                                                                <!-- TikTok (copia el enlace) -->
+                                                                                <li>
+                                                                                    <a class="icon fa-tiktok"
+                                                                                       href="javascript:void(0);"
+                                                                                       onclick="copiarEnlace('@($"{Context.Request.Scheme}://{Context.Request.Host}{Url.Action("Details", "Noticias", new { id = noticia.NoticiasId })}")')"
+                                                                                       title="Compartir en TikTok">
+                                                                                        <i class="fab fa-tiktok"></i>
+                                                                                    </a>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -79,3 +114,15 @@
         </div>
     </div>
 </footer>
+@section Scripts {
+    <script>
+        function copiarEnlace(url) {
+            navigator.clipboard.writeText(url).then(function () {
+                alert('Enlace copiado al portapapeles. Ahora puedes compartirlo en la app.');
+            }, function (err) {
+                alert('No se pudo copiar el enlace');
+            });
+        }
+    </script>
+}
+

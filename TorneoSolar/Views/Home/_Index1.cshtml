@@ -1,5 +1,18 @@
 ﻿@model TorneoSolar.Models.HomeViewModel
 
+<style>
+    .post-future-footer a:hover .fa-facebook {
+        color: #145db2 !important;
+    }
+
+    .post-future-footer a:hover .fa-instagram {
+        color: #bc2a8d !important;
+    }
+
+    .post-future-footer a:hover .fa-tiktok {
+        color: #25F4EE !important;
+    }
+</style>
 
 <!-- Latest News-->
 <section class="section section-md bg-gray-100">
@@ -37,6 +50,51 @@
                                         <hr />
                                         <div class="post-future-text">
                                             <p>@noticia.Comentario</p>
+                                        </div>>
+                                        <div class="post-future-footer group-flex group-flex-xs justify-content-center mt-2">
+                                            <span class="me-2">Compartir:</span>
+                                            <!-- Facebook -->
+                                            <a class="mx-2"
+                                               style="color: #1877f3;"
+                                               href="https://www.facebook.com/sharer/sharer.php?u=@($"{Context.Request.Scheme}://{Context.Request.Host}{Url.Action("Details", "Noticias", new { id = noticia.NoticiasId })}")"
+                                               target="_blank" title="Compartir en Facebook">
+                                                <i class="fab fa-facebook fa-2x"></i>
+                                            </a>
+                                            <!-- Instagram -->
+                                            <a class="mx-2"
+                                               style="color: #E4405F;"
+                                               href="https://www.instagram.com/"
+                                               target="_blank"
+                                               title="Compartir en Instagram"
+                                               onclick="copiarEnlace('@($"{Context.Request.Scheme}://{Context.Request.Host}{Url.Action("Details", "Noticias", new { id = noticia.NoticiasId })}")')">
+                                                <i class="fab fa-instagram fa-2x"></i>
+                                            </a>
+                                            <!-- TikTok -->
+                                            <a class="mx-2"
+                                               style="color: #000;"
+                                               href="https://www.tiktok.com/"
+                                               target="_blank"
+                                               title="Compartir en TikTok"
+                                               onclick="copiarEnlace('@($"{Context.Request.Scheme}://{Context.Request.Host}{Url.Action("Details", "Noticias", new { id = noticia.NoticiasId })}")')">
+                                                <i class="fab fa-tiktok fa-2x"></i>
+                                            </a>
+                                            <!-- Agrega este modal al final de tu archivo -->
+                                            <div class="modal fade" id="modalInstagram" tabindex="-1" aria-labelledby="modalInstagramLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="modalInstagramLabel">Compartir en Instagram</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>El enlace ha sido copiado al portapapeles.</p>
+                                                            <p>Abre Instagram y elige si quieres compartirlo como Reel, Historia o Publicación.</p>
+                                                            <a href="https://www.instagram.com/" target="_blank" class="btn btn-primary">Ir a Instagram</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </article>
@@ -48,3 +106,14 @@
         </div>
     </div>
 </section>
+@section Scripts {
+    <script>
+        function copiarEnlace(url) {
+            navigator.clipboard.writeText(url).then(function () {
+                alert('Enlace copiado al portapapeles. Ahora puedes compartirlo en la app.');
+            }, function (err) {
+                alert('No se pudo copiar el enlace');
+            });
+        }
+    </script>
+}

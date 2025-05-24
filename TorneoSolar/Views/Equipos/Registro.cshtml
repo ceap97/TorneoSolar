@@ -7,12 +7,13 @@
 
 <div class="container mt-4">
     <div class="row mb-3">
-        <div class="col">
+        <div class="col text-center">
             <h2 class="fw-bold text-primary">
                 <i class="bi bi-person-plus"></i> Registro de Equipo
             </h2>
         </div>
     </div>
+
     <div class="row justify-content-center">
         <div class="col-md-7 col-lg-6">
             <div class="card shadow-sm border-0">
@@ -51,4 +52,17 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @if (TempData["Mensaje"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: '¡Solicitud enviada!',
+                text: 'Un administrador revisará tu registro.',
+                confirmButtonText: 'Aceptar'
+            });
+        </script>
+    }
 }
+

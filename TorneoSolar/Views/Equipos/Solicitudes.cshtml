@@ -67,3 +67,17 @@
         </div>
     </div>
 </div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @if (TempData["Aprobado"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: '¡Equipo aprobado!',
+                text: '@TempData["Aprobado"]',
+                confirmButtonText: 'Aceptar'
+            });
+        </script>
+    }
+}

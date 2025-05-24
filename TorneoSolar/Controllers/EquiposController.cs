@@ -94,6 +94,7 @@ namespace TorneoSolar.Controllers
             _context.SolicitudesEquipos.Update(solicitud);
 
             await _context.SaveChangesAsync();
+            TempData["Aprobado"] = "El equipo ha sido aprobado exitosamente.";
             return RedirectToAction("Solicitudes");
         }
 
