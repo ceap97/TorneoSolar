@@ -19,6 +19,84 @@ namespace TorneoSolar.Controllers
         {
             _context = context;
         }
+        // GET: Equipos/Registro
+        [HttpGet]
+        public IActionResult Registro()
+        {
+            return View();
+        }
+
+        // POST: Equipos/Registro
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Registro([Bind("Nombre,Ciudad")] SolicitudEquipo solicitud, IFormFile logo)
+        {
+            if (ModelState.IsValid)
+            {
+                // Guardar logo si se sube
+                if (logo != null)
+                {
+                    var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/solicitudes");
+                    if (!Directory.Exists(uploadPath))
+                        Directory.CreateDirectory(uploadPath);
+
+                    var fileName = $"{solicitud.Nombre}_{DateTime.Now.Ticks}.jpeg";
+                    var filePath = Path.Combine(uploadPath, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await logo.CopyToAsync(stream);
+                    }
+                    solicitud.Logo = $"/images/solicitudes/{fileName}";
+                }
+
+                solicitud.FechaSolicitud = DateTime.Now;
+                solicitud.Aprobada = false;
+
+                _context.SolicitudesEquipos.Add(solicitud);
+                await _context.SaveChangesAsync();
+
+                TempData["Mensaje"] = "¡Solicitud enviada! Un administrador revisará tu registro.";
+                return RedirectToAction("Registro");
+            }
+            return View(solicitud);
+        }
+
+        // GET: Equipos/Solicitudes
+        [Authorize]
+        public async Task<IActionResult> Solicitudes()
+        {
+            var solicitudes = await _context.SolicitudesEquipos
+                .Where(s => !s.Aprobada)
+                .OrderByDescending(s => s.FechaSolicitud)
+                .ToListAsync();
+            return View(solicitudes);
+        }
+
+        // POST: Equipos/AprobarSolicitud/5
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> AprobarSolicitud(int id)
+        {
+            var solicitud = await _context.SolicitudesEquipos.FindAsync(id);
+            if (solicitud == null) return NotFound();
+
+            // Crear el equipo real
+            var equipo = new Equipo
+            {
+                Nombre = solicitud.Nombre,
+                Ciudad = solicitud.Ciudad,
+                Logo = solicitud.Logo
+            };
+            _context.Equipos.Add(equipo);
+
+            solicitud.Aprobada = true;
+            _context.SolicitudesEquipos.Update(solicitud);
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Solicitudes");
+        }
+
         public async Task<IActionResult> Partidos(int equipoId)
         {
             var partidos = await _context.Partidos

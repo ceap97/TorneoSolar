@@ -25,6 +25,7 @@ public partial class TorneoSolarContext : DbContext
     public virtual DbSet<Partido> Partidos { get; set; }
 
     public virtual DbSet<ResultadosPartido> ResultadosPartidos { get; set; }
+    public virtual DbSet<SolicitudEquipo> SolicitudesEquipos { get; set; }
     public virtual DbSet<VisitorCount> VisitorCounts { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) { }

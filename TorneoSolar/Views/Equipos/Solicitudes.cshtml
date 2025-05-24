@@ -1,0 +1,69 @@
+﻿@model IEnumerable<TorneoSolar.Models.SolicitudEquipo>
+@{
+    ViewData["Title"] = "Solicitudes de Registro de Equipos";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="row mb-3">
+        <div class="col">
+            <h2 class="fw-bold text-primary">
+                <i class="bi bi-person-plus"></i> Solicitudes de Registro de Equipos
+            </h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <table class="table table-hover align-middle shadow-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Ciudad</th>
+                        <th scope="col">Logo</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col" class="text-center">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var s in Model)
+                        {
+                            <tr>
+                                <td>@s.Nombre</td>
+                                <td>@s.Ciudad</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(s.Logo))
+                                    {
+                                        <img src="@s.Logo" alt="Logo de @s.Nombre" class="rounded-circle border" width="48" height="48" style="object-fit:cover;" />
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic">Sin logo</span>
+                                    }
+                                </td>
+                                <td>@s.FechaSolicitud.ToString("g")</td>
+                                <td class="text-center">
+                                    <form asp-action="AprobarSolicitud" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@s.SolicitudEquipoId" />
+                                        <button type="submit" class="btn btn-success btn-sm" title="Aprobar">
+                                            <i class="bi bi-check-circle"></i> Aprobar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">
+                                No hay solicitudes pendientes.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
