@@ -7,96 +7,112 @@
 <div class="container mt-4">
     <div class="row mb-3">
         <div class="col">
-            <h2 class="fw-bold text-primary">
-                <i class="bi bi-person-plus"></i> Solicitudes de Registro de Equipos
-            </h2>
+            <div class="d-flex align-items-center">
+                <h2 class="fw-bold text-primary mb-0">
+                    <i class="bi bi-person-plus"></i> Solicitudes de Registro de Equipos
+                </h2>
+            </div>
+            <hr class="mt-2 mb-4" />
         </div>
     </div>
     <div class="row">
-        <div class="col">
-            <table class="table table-hover align-middle shadow-sm">
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Ciudad</th>
-                        <th scope="col">Logo</th>
-                        <th scope="col">Correo</th>
-                        <th scope="col">Entrenador/Asistente</th>
-                        <th scope="col">Teléfono</th>
-                        <th scope="col">Planilla</th>
-                        <th scope="col">Fecha</th>
-                        <th scope="col" class="text-center">Acción</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model != null && Model.Any())
-                    {
-                        foreach (var s in Model)
-                        {
-                            <tr>
-                                <td>@s.Nombre</td>
-                                <td>@s.Ciudad</td>
-                                <td>
-                                    @if (!string.IsNullOrEmpty(s.Logo))
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Ciudad</th>
+                                    <th scope="col">Logo</th>
+                                    <th scope="col">Correo</th>
+                                    <th scope="col">Entrenador/Asistente</th>
+                                    <th scope="col">Teléfono</th>
+                                    <th scope="col">Planilla</th>
+                                    <th scope="col">Fecha</th>
+                                    <th scope="col" class="text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null && Model.Any())
+                                {
+                                    foreach (var s in Model)
                                     {
-                                        <img src="@s.Logo" alt="Logo de @s.Nombre" class="rounded-circle border" width="48" height="48" style="object-fit:cover;" />
+                                        <tr>
+                                            <td class="fw-semibold text-break">@s.Nombre</td>
+                                            <td class="text-break">@s.Ciudad</td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(s.Logo))
+                                                {
+                                                    <img src="@s.Logo" alt="Logo de @s.Nombre" class="rounded-circle border border-2" width="48" height="48" style="object-fit:cover;" />
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted fst-italic">Sin logo</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-light text-dark text-break">@s.Correo</span>
+                                            </td>
+                                            <td class="text-break">@s.NombreEncargado</td>
+                                            <td>
+                                                <span class="badge bg-secondary">@s.Telefono</span>
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(s.Planilla))
+                                                {
+                                                    <a href="@s.Planilla" target="_blank" class="btn btn-outline-primary btn-sm">
+                                                        <i class="bi bi-file-earmark-text"></i> Ver
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted fst-italic">Sin planilla</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (s.FechaSolicitud.HasValue)
+                                                {
+                                                    <span class="text-nowrap">@s.FechaSolicitud.Value.ToString("g")</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted fst-italic">Sin fecha</span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                                    <form asp-action="AprobarSolicitud" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@s.SolicitudEquipoId" />
+                                                        <button type="submit" class="btn btn-success btn-sm mb-1" title="Aprobar">
+                                                            <i class="bi bi-check-circle"></i>
+                                                        </button>
+                                                    </form>
+                                                    <form asp-action="DenegarSolicitud" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@s.SolicitudEquipoId" />
+                                                        <button type="submit" class="btn btn-danger btn-sm mb-1" title="Denegar" onclick="return confirm('¿Seguro que deseas denegar y eliminar esta solicitud?');">
+                                                            <i class="bi bi-x-circle"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
                                     }
-                                    else
-                                    {
-                                        <span class="text-muted fst-italic">Sin logo</span>
-                                    }
-                                </td>
-                                <td>@s.Correo</td>
-                                <td>@s.NombreEncargado</td>
-                                <td>@s.Telefono</td>
-                                <td>
-                                    @if (!string.IsNullOrEmpty(s.Planilla))
-                                    {
-                                        <a href="@s.Planilla" target="_blank">Ver</a>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted fst-italic">Sin planilla</span>
-                                    }
-                                </td>
-                                <td>
-                                    @if (s.FechaSolicitud.HasValue)
-                                    {
-                                        @s.FechaSolicitud.Value.ToString("g")
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted fst-italic">Sin fecha</span>
-                                    }
-                                </td>
-                                <td class="text-center">
-                                    <form asp-action="AprobarSolicitud" method="post" class="d-inline">
-                                        <input type="hidden" name="id" value="@s.SolicitudEquipoId" />
-                                        <button type="submit" class="btn btn-success btn-sm" title="Aprobar">
-                                            <i class="bi bi-check-circle"></i> Aprobar
-                                        </button>
-                                    </form>
-                                    <form asp-action="DenegarSolicitud" method="post" class="d-inline ms-1">
-                                        <input type="hidden" name="id" value="@s.SolicitudEquipoId" />
-                                        <button type="submit" class="btn btn-danger btn-sm" title="Denegar" onclick="return confirm('¿Seguro que deseas denegar y eliminar esta solicitud?');">
-                                            <i class="bi bi-x-circle"></i> Denegar
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="9" class="text-center text-muted py-4">
-                                No hay solicitudes pendientes.
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-
-            </table>
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="9" class="text-center text-muted py-4">
+                                            No hay solicitudes pendientes.
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

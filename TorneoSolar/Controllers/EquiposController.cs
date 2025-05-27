@@ -25,6 +25,7 @@ namespace TorneoSolar.Controllers
         {
             _context = context;
         }
+        [Authorize]
 
         [HttpPost]
         // Método privado para enviar correos
@@ -61,6 +62,7 @@ namespace TorneoSolar.Controllers
                 return false;
             }
         }
+        [Authorize]
 
         [HttpPost]
         public async Task<IActionResult> DenegarSolicitud(int id)

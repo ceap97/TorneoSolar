@@ -5,6 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@11.1.0/dist/css/shepherd.css" />
 
 <div class="container mt-4">
     <div class="row mb-3">
@@ -13,11 +14,13 @@
                 <i class="bi bi-person-plus"></i> Registro de Equipo
             </h2>
             <div class="mt-2">
-                <a href="~/planillas/torneo (el solar) planilla.xls" class="btn btn-outline-success btn-sm" download>
+                <a href="~/planillas/torneo (el solar) planilla.xls" class="btn btn-outline-success btn-sm" download id="descargarPlanillaBtn">
                     <i class="fa-solid fa-file-zipper me-1"></i> Descargar planilla de equipo
                 </a>
             </div>
-
+            <button type="button" class="btn btn-info btn-sm mt-3" id="ayudaRegistroBtn">
+                <i class="fa fa-question-circle"></i> ¿Necesitas ayuda?
+            </button>
         </div>
     </div>
     <div class="row justify-content-center">
@@ -27,37 +30,37 @@
                     <form asp-action="Registro" enctype="multipart/form-data" method="post" autocomplete="on">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
                         <div class="mb-3">
-                            <input asp-for="Nombre" class="form-control" placeholder="Nombre del equipo" />
+                            <input asp-for="Nombre" class="form-control" placeholder="Nombre del equipo" id="nombreEquipoInput" />
                             <span asp-validation-for="Nombre" class="text-danger small"></span>
                         </div>
                         <div class="mb-3">
-                            <input asp-for="Ciudad" class="form-control" placeholder="Ciudad" />
+                            <input asp-for="Ciudad" class="form-control" placeholder="Ciudad" id="ciudadInput" />
                             <span asp-validation-for="Ciudad" class="text-danger small"></span>
                         </div>
                         <div class="mb-3">
-                            <input asp-for="NombreEncargado" class="form-control" placeholder="Nombre del entrenador y/o asistente" />
+                            <input asp-for="NombreEncargado" class="form-control" placeholder="Nombre del entrenador y/o asistente" id="entrenadorInput" />
                             <span asp-validation-for="NombreEncargado" class="text-danger small"></span>
                         </div>
                         <div class="mb-3">
-                            <input asp-for="Correo" class="form-control" placeholder="Correo electrónico" type="email" />
+                            <input asp-for="Correo" class="form-control" placeholder="Correo electrónico" type="email" id="correoInput" />
                             <span asp-validation-for="Correo" class="text-danger small"></span>
                         </div>
                         <div class="mb-3">
-                            <input asp-for="Telefono" class="form-control" placeholder="Teléfono" type="tel" />
+                            <input asp-for="Telefono" class="form-control" placeholder="Teléfono" type="tel" id="telefonoInput" />
                             <span asp-validation-for="Telefono" class="text-danger small"></span>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold"></label>
-                            <input type="file" name="logo" class="form-control" accept="image/*" />
+                            <input type="file" name="logo" class="form-control" accept="image/*" id="logoInput" />
                             <div class="form-text"> Adjunta el Logo de tu equipo. Formatos permitidos: JPG, PNG, JPEG. Tamaño máximo: 2MB.</div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold"></label>
-                            <input type="file" name="planilla" class="form-control" accept=".pdf,.xls,.xlsx,.csv" />
+                            <input type="file" name="planilla" class="form-control" accept=".pdf,.xls,.xlsx,.csv" id="planillaInput" />
                             <div class="form-text">Adjunta la planilla de tu equipo. Tamaño máximo: 5MB.</div>
                         </div>
                         <div class="d-flex justify-content-between">
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-primary" id="enviarBtn">
                                 <i class="bi bi-send"></i> Enviar Solicitud
                             </button>
                             <a href="/" class="btn btn-secondary">
@@ -75,31 +78,131 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/shepherd.js@11.1.0/dist/js/shepherd.min.js"></script>
     @if (TempData["Mensaje"] != null)
     {
+                <script>
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Solicitud enviada!',
+                        text: 'Un administrador revisará tu registro.',
+                        confirmButtonText: 'Aceptar'
+                    });
+                </script>
+    }
         <script>
-            Swal.fire({
-                icon: 'success',
-                title: '¡Solicitud enviada!',
-                text: 'Un administrador revisará tu registro.',
-                confirmButtonText: 'Aceptar'
+            document.addEventListener('DOMContentLoaded', function () {
+                var downloadBtn = document.querySelector('a[download]');
+                if (downloadBtn) {
+                    downloadBtn.addEventListener('click', function () {
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1000); // Espera 1 segundo antes de recargar
+                    });
+                }
+
+                // Shepherd.js tutorial
+                var tour = new Shepherd.Tour({
+                    defaultStepOptions: {
+                        scrollTo: { behavior: 'smooth', block: 'center' },
+                        cancelIcon: { enabled: true }
+                    }
+                });
+
+                tour.addStep({
+                    title: '¡Bienvenido al registro!',
+                    text: 'Aquí podrás registrar tu equipo para el torneo. Haz clic en "Siguiente" para ver los pasos.',
+                    attachTo: { element: '#ayudaRegistroBtn', on: 'bottom' },
+                    buttons: [
+                        { text: 'Siguiente', action: tour.next }
+                    ]
+                });
+                tour.addStep({
+                    title: 'Descarga la planilla',
+                    text: 'Primero, descarga la planilla de equipo. Debes llenarla y luego adjuntarla al final.',
+                    attachTo: { element: '#descargarPlanillaBtn', on: 'bottom' },
+                    buttons: [
+                        { text: 'Anterior', action: tour.back },
+                        { text: 'Siguiente', action: tour.next }
+                    ]
+                });
+                tour.addStep({
+                    title: 'Nombre del equipo',
+                    text: 'Escribe el nombre de tu equipo aquí.',
+                    attachTo: { element: '#nombreEquipoInput', on: 'bottom' },
+                    buttons: [
+                        { text: 'Anterior', action: tour.back },
+                        { text: 'Siguiente', action: tour.next }
+                    ]
+                });
+                tour.addStep({
+                    title: 'Ciudad',
+                    text: 'Indica la ciudad de tu equipo.',
+                    attachTo: { element: '#ciudadInput', on: 'bottom' },
+                    buttons: [
+                        { text: 'Anterior', action: tour.back },
+                        { text: 'Siguiente', action: tour.next }
+                    ]
+                });
+                tour.addStep({
+                    title: 'Entrenador o asistente',
+                    text: 'Escribe el nombre del entrenador o asistente responsable.',
+                    attachTo: { element: '#entrenadorInput', on: 'bottom' },
+                    buttons: [
+                        { text: 'Anterior', action: tour.back },
+                        { text: 'Siguiente', action: tour.next }
+                    ]
+                });
+                tour.addStep({
+                    title: 'Correo electrónico',
+                    text: 'Introduce un correo electrónico de contacto.',
+                    attachTo: { element: '#correoInput', on: 'bottom' },
+                    buttons: [
+                        { text: 'Anterior', action: tour.back },
+                        { text: 'Siguiente', action: tour.next }
+                    ]
+                });
+                tour.addStep({
+                    title: 'Teléfono',
+                    text: 'Agrega un número de teléfono de contacto.',
+                    attachTo: { element: '#telefonoInput', on: 'bottom' },
+                    buttons: [
+                        { text: 'Anterior', action: tour.back },
+                        { text: 'Siguiente', action: tour.next }
+                    ]
+                });
+                tour.addStep({
+                    title: 'Logo del equipo',
+                    text: 'Adjunta el logo de tu equipo (opcional, pero recomendado).',
+                    attachTo: { element: '#logoInput', on: 'bottom' },
+                    buttons: [
+                        { text: 'Anterior', action: tour.back },
+                        { text: 'Siguiente', action: tour.next }
+                    ]
+                });
+                tour.addStep({
+                    title: 'Adjunta la planilla diligenciada',
+                    text: 'Por último, adjunta la planilla que descargaste y diligenciaste.',
+                    attachTo: { element: '#planillaInput', on: 'bottom' },
+                    buttons: [
+                        { text: 'Anterior', action: tour.back },
+                        { text: 'Siguiente', action: tour.next }
+                    ]
+                });
+                tour.addStep({
+                    title: 'Envía tu solicitud',
+                    text: 'Haz clic en "Enviar Solicitud" para completar el registro. ¡Listo!',
+                    attachTo: { element: '#enviarBtn', on: 'bottom' },
+                    buttons: [
+                        { text: 'Anterior', action: tour.back },
+                        { text: 'Finalizar', action: tour.complete }
+                    ]
+                });
+
+                document.getElementById('ayudaRegistroBtn').addEventListener('click', function () {
+                    tour.start();
+                });
             });
         </script>
-    }
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var downloadBtn = document.querySelector('a[download]');
-            if (downloadBtn) {
-                downloadBtn.addEventListener('click', function () {
-                    setTimeout(function () {
-                        location.reload();
-                    }, 1000); // Espera 1 segundo antes de recargar
-                });
-            }
-        });
-    </script>
 }
-
-
-
