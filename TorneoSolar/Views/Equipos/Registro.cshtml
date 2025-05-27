@@ -13,15 +13,14 @@
             </h2>
         </div>
     </div>
-
     <div class="row justify-content-center">
         <div class="col-md-7 col-lg-6">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <form asp-action="Registro" enctype="multipart/form-data" method="post" autocomplete="off">
+                    <form asp-action="Registro" enctype="multipart/form-data" method="post" autocomplete="on">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
                         <div class="mb-3">
-                            <input asp-for="Nombre" class="form-control" placeholder="Nombre" />
+                            <input asp-for="Nombre" class="form-control" placeholder="Nombre del equipo" />
                             <span asp-validation-for="Nombre" class="text-danger small"></span>
                         </div>
                         <div class="mb-3">
@@ -29,9 +28,26 @@
                             <span asp-validation-for="Ciudad" class="text-danger small"></span>
                         </div>
                         <div class="mb-3">
+                            <input asp-for="NombreEncargado" class="form-control" placeholder="Nombre del entrenador y/o asistente" />
+                            <span asp-validation-for="NombreEncargado" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <input asp-for="Correo" class="form-control" placeholder="Correo electrónico" type="email" />
+                            <span asp-validation-for="Correo" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <input asp-for="Telefono" class="form-control" placeholder="Teléfono" type="tel" />
+                            <span asp-validation-for="Telefono" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label fw-semibold"></label>
                             <input type="file" name="logo" class="form-control" accept="image/*" />
-                            <div class="form-text">Formatos permitidos: JPG, PNG, JPEG. Tamaño máximo: 2MB.</div>
+                            <div class="form-text"> Adjunta el Logo de tu equipo. Formatos permitidos: JPG, PNG, JPEG. Tamaño máximo: 2MB.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold"></label>
+                            <input type="file" name="planilla" class="form-control" accept=".pdf,.xls,.xlsx,.csv" />
+                            <div class="form-text">Adjunta la planilla de tu equipo. Tamaño máximo: 5MB.</div>
                         </div>
                         <div class="d-flex justify-content-between">
                             <button type="submit" class="btn btn-primary">
@@ -65,4 +81,5 @@
         </script>
     }
 }
+
 

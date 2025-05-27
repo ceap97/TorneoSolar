@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +21,20 @@ namespace TorneoSolar.Controllers
         {
             _context = context;
         }
+
+        [HttpPost]
+        public async Task<IActionResult> DenegarSolicitud(int id)
+        {
+            var solicitud = await _context.SolicitudesEquipos.FindAsync(id);
+            if (solicitud != null)
+            {
+                _context.SolicitudesEquipos.Remove(solicitud);
+                await _context.SaveChangesAsync();
+                TempData["Aprobado"] = "Solicitud denegada y eliminada correctamente.";
+            }
+            return RedirectToAction("Solicitudes");
+        }
+
         // GET: Equipos/Registro
         [HttpGet]
         public IActionResult Registro()
@@ -29,18 +45,18 @@ namespace TorneoSolar.Controllers
         // POST: Equipos/Registro
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Registro([Bind("Nombre,Ciudad")] SolicitudEquipo solicitud, IFormFile logo)
+        public async Task<IActionResult> Registro(SolicitudEquipo solicitud, IFormFile logo, IFormFile planilla)
         {
             if (ModelState.IsValid)
             {
                 // Guardar logo si se sube
-                if (logo != null)
+                if (logo != null && logo.Length > 0)
                 {
                     var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/solicitudes");
                     if (!Directory.Exists(uploadPath))
                         Directory.CreateDirectory(uploadPath);
 
-                    var fileName = $"{solicitud.Nombre}_{DateTime.Now.Ticks}.jpeg";
+                    var fileName = $"{solicitud.Nombre}_{DateTime.Now.Ticks}{Path.GetExtension(logo.FileName)}";
                     var filePath = Path.Combine(uploadPath, fileName);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
@@ -48,6 +64,23 @@ namespace TorneoSolar.Controllers
                         await logo.CopyToAsync(stream);
                     }
                     solicitud.Logo = $"/images/solicitudes/{fileName}";
+                }
+
+                // Guardar planilla si se sube
+                if (planilla != null && planilla.Length > 0)
+                {
+                    var planillaPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/planillas/solicitudes");
+                    if (!Directory.Exists(planillaPath))
+                        Directory.CreateDirectory(planillaPath);
+
+                    var planillaFileName = $"{solicitud.Nombre}_{DateTime.Now.Ticks}{Path.GetExtension(planilla.FileName)}";
+                    var planillaFilePath = Path.Combine(planillaPath, planillaFileName);
+
+                    using (var stream = new FileStream(planillaFilePath, FileMode.Create))
+                    {
+                        await planilla.CopyToAsync(stream);
+                    }
+                    solicitud.Planilla = $"/planillas/solicitudes/{planillaFileName}";
                 }
 
                 solicitud.FechaSolicitud = DateTime.Now;
@@ -62,6 +95,7 @@ namespace TorneoSolar.Controllers
             return View(solicitud);
         }
 
+
         // GET: Equipos/Solicitudes
         [Authorize]
         public async Task<IActionResult> Solicitudes()
@@ -73,7 +107,6 @@ namespace TorneoSolar.Controllers
             return View(solicitudes);
         }
 
-        // POST: Equipos/AprobarSolicitud/5
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> AprobarSolicitud(int id)
@@ -94,9 +127,47 @@ namespace TorneoSolar.Controllers
             _context.SolicitudesEquipos.Update(solicitud);
 
             await _context.SaveChangesAsync();
-            TempData["Aprobado"] = "El equipo ha sido aprobado exitosamente.";
+
+            // Enviar correo de notificación
+            try
+            {
+                var fromAddress = new MailAddress("solarbaclub@gmail.com", "Torneo Solar");
+                var toAddress = new MailAddress(solicitud.Correo, solicitud.NombreEncargado);
+                const string fromPassword = "wldc phxl eski qkyd\r\n"; // Usa configuración segura en producción
+                const string subject = "¡Tu equipo ha sido aprobado!";
+                string body = $"Hola {solicitud.NombreEncargado},\n\n" +
+                              $"Tu equipo \"{solicitud.Nombre}\" ha sido aprobado para participar en el Torneo Solar.\n\n" +
+                              $"¡Bienvenido!\n\n" +
+                              $"Saludos,\nTorneo Solar";
+
+                var smtp = new SmtpClient
+                {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential("solarbaclub@gmail.com", fromPassword) // El usuario es el correo completo
+                };
+                using (var message = new MailMessage(fromAddress, toAddress)
+                {
+                    Subject = subject,
+                    Body = body
+                })
+                {
+                    await smtp.SendMailAsync(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Aprobado"] = "El equipo ha sido aprobado, pero no se pudo enviar el correo: " + ex.Message;
+                return RedirectToAction("Solicitudes");
+            }
+
+            TempData["Aprobado"] = "El equipo ha sido aprobado exitosamente y se notificó al correo del encargado.";
             return RedirectToAction("Solicitudes");
         }
+
 
         public async Task<IActionResult> Partidos(int equipoId)
         {

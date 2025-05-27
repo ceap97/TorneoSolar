@@ -20,6 +20,10 @@
                         <th scope="col">Nombre</th>
                         <th scope="col">Ciudad</th>
                         <th scope="col">Logo</th>
+                        <th scope="col">Correo</th>
+                        <th scope="col">Entrenador/Asistente</th>
+                        <th scope="col">Teléfono</th>
+                        <th scope="col">Planilla</th>
                         <th scope="col">Fecha</th>
                         <th scope="col" class="text-center">Acción</th>
                     </tr>
@@ -42,12 +46,31 @@
                                         <span class="text-muted fst-italic">Sin logo</span>
                                     }
                                 </td>
+                                <td>@s.Correo</td>
+                                <td>@s.NombreEncargado</td>
+                                <td>@s.Telefono</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(s.Planilla))
+                                    {
+                                        <a href="@s.Planilla" target="_blank">Ver</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic">Sin planilla</span>
+                                    }
+                                </td>
                                 <td>@s.FechaSolicitud.ToString("g")</td>
                                 <td class="text-center">
                                     <form asp-action="AprobarSolicitud" method="post" class="d-inline">
                                         <input type="hidden" name="id" value="@s.SolicitudEquipoId" />
                                         <button type="submit" class="btn btn-success btn-sm" title="Aprobar">
                                             <i class="bi bi-check-circle"></i> Aprobar
+                                        </button>
+                                    </form>
+                                    <form asp-action="DenegarSolicitud" method="post" class="d-inline ms-1">
+                                        <input type="hidden" name="id" value="@s.SolicitudEquipoId" />
+                                        <button type="submit" class="btn btn-danger btn-sm" title="Denegar" onclick="return confirm('¿Seguro que deseas denegar y eliminar esta solicitud?');">
+                                            <i class="bi bi-x-circle"></i> Denegar
                                         </button>
                                     </form>
                                 </td>
@@ -57,12 +80,13 @@
                     else
                     {
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-4">
+                            <td colspan="9" class="text-center text-muted py-4">
                                 No hay solicitudes pendientes.
                             </td>
                         </tr>
                     }
                 </tbody>
+
             </table>
         </div>
     </div>
