@@ -59,7 +59,16 @@
                                         <span class="text-muted fst-italic">Sin planilla</span>
                                     }
                                 </td>
-                                <td>@s.FechaSolicitud.ToString("g")</td>
+                                <td>
+                                    @if (s.FechaSolicitud.HasValue)
+                                    {
+                                        @s.FechaSolicitud.Value.ToString("g")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic">Sin fecha</span>
+                                    }
+                                </td>
                                 <td class="text-center">
                                     <form asp-action="AprobarSolicitud" method="post" class="d-inline">
                                         <input type="hidden" name="id" value="@s.SolicitudEquipoId" />

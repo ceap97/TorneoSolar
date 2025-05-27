@@ -16,6 +16,10 @@ namespace TorneoSolar.Controllers
     {
         private readonly TorneoSolarContext _context;
         private readonly string _uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/equipos");
+        private const string FromEmail = "solarbaclub@gmail.com";
+        private const string FromName = "Torneo Solar";
+        private const string FromPassword = "wldc phxl eski qkyd\r\n"; // Usa configuración segura en producción
+
 
         public EquiposController(TorneoSolarContext context)
         {
@@ -23,17 +27,86 @@ namespace TorneoSolar.Controllers
         }
 
         [HttpPost]
+        // Método privado para enviar correos
+        private async Task<bool> EnviarCorreoAsync(string destinatario, string nombreDestinatario, string asunto, string cuerpo)
+        {
+            try
+            {
+                var fromAddress = new MailAddress(FromEmail, FromName);
+                var toAddress = new MailAddress(destinatario, nombreDestinatario);
+
+                var smtp = new SmtpClient
+                {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(FromEmail, FromPassword)
+                };
+
+                using (var message = new MailMessage(fromAddress, toAddress)
+                {
+                    Subject = asunto,
+                    Body = cuerpo,
+                    IsBodyHtml = true
+                })
+                {
+                    await smtp.SendMailAsync(message);
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        [HttpPost]
         public async Task<IActionResult> DenegarSolicitud(int id)
         {
             var solicitud = await _context.SolicitudesEquipos.FindAsync(id);
-            if (solicitud != null)
+            if (solicitud == null)
             {
-                _context.SolicitudesEquipos.Remove(solicitud);
-                await _context.SaveChangesAsync();
-                TempData["Aprobado"] = "Solicitud denegada y eliminada correctamente.";
+                return NotFound();
             }
-            return RedirectToAction("Solicitudes");
+
+            // Determinar el motivo del rechazo
+            string motivo;
+            if (string.IsNullOrEmpty(solicitud.Planilla) && string.IsNullOrEmpty(solicitud.Logo))
+            {
+                motivo = "Tu solicitud fue rechazada porque no adjuntaste ni el logo ni la planilla del equipo. Por favor, asegúrate de adjuntar ambos archivos al volver a intentarlo.";
+            }
+            else
+            {
+                motivo = "Tu solicitud fue rechazada. Por favor, revisa los datos y vuelve a intentarlo.";
+            }
+
+            // Enviar correo de notificación
+            if (!string.IsNullOrEmpty(solicitud.Correo))
+            {
+                var subject = "Solicitud de registro de equipo denegada";
+                var body = $@"
+                    <p>Hola {solicitud.NombreEncargado},</p>
+                    <p>{motivo}</p>
+                    <p>Equipo: <strong>{solicitud.Nombre}</strong></p>
+                    <p>Ciudad: <strong>{solicitud.Ciudad}</strong></p>
+                    <p>Fecha de solicitud: <strong>{solicitud.FechaSolicitud?.ToString("g")}</strong></p>
+                    <p>Atentamente,<br/>El equipo de Torneo Solar</p>
+                ";
+
+                await EnviarCorreoAsync(solicitud.Correo, solicitud.NombreEncargado, subject, body);
+            }
+
+            // Eliminar la solicitud
+            _context.SolicitudesEquipos.Remove(solicitud);
+            await _context.SaveChangesAsync();
+
+            TempData["Aprobado"] = "La solicitud fue denegada y se notificó al solicitante.";
+            return RedirectToAction(nameof(Solicitudes));
         }
+
+
 
         // GET: Equipos/Registro
         [HttpGet]
