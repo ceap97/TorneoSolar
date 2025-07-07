@@ -20,13 +20,21 @@
                 <dt class="col-sm-5">Resultado</dt>
                 <dd class="col-sm-7">@Html.DisplayFor(model => model.Resultado.ResultadoId)</dd>
                 <dt class="col-sm-5">Equipo Local</dt>
-                <dd class="col-sm-7">@Html.DisplayFor(model => model.EquipoLocal.EquipoId)</dd>
+                <dd class="col-sm-7">
+                    @Model.EquipoLocal?.Nombre
+                    @if (Model.TablaPosicionesLocal != null)
+                    {
+                        <span class="badge bg-secondary ms-2">Posición: @Model.TablaPosicionesLocal.Id</span>
+                    }
+                </dd>
                 <dt class="col-sm-5">Equipo Visitante</dt>
-                <dd class="col-sm-7">@Html.DisplayFor(model => model.EquipoVisitante.EquipoId)</dd>
-                <dt class="col-sm-5">Tabla Posiciones Local</dt>
-                <dd class="col-sm-7">@Html.DisplayFor(model => model.TablaPosicionesLocal.Id)</dd>
-                <dt class="col-sm-5">Tabla Posiciones Visitante</dt>
-                <dd class="col-sm-7">@Html.DisplayFor(model => model.TablaPosicionesVisitante.Id)</dd>
+                <dd class="col-sm-7">
+                    @Model.EquipoVisitante?.Nombre
+                    @if (Model.TablaPosicionesVisitante != null)
+                    {
+                        <span class="badge bg-secondary ms-2">Posición: @Model.TablaPosicionesVisitante.Id</span>
+                    }
+                </dd>
             </dl>
         </div>
     </div>

@@ -17,16 +17,63 @@
         <div class="card shadow-sm m-2" style="width: 420px; max-width: 100%;">
             <div class="card-body">
                 <h5 class="card-title text-center text-uppercase fw-bold mb-3">
-                    Ronda: @item.Ronda
+                    Ronda:
+                    <span class="badge bg-info text-dark">
+                        @{
+                            string rondaNombre = item.Ronda switch
+                            {
+                                1 => "Cuartos de final",
+                                2 => "Semifinal",
+                                3 => "Final",
+                                _ => "Otra"
+                            };
+                        }
+                        @rondaNombre
+                    </span>
                 </h5>
+
                 <ul class="list-group list-group-flush mb-3">
-                    <li class="list-group-item"><strong>Fecha de Creación:</strong> @item.FechaCreacion.ToString("dd/MM/yyyy")</li>
-                    <li class="list-group-item"><strong>Partido:</strong> @item.Partido?.PartidoId</li>
-                    <li class="list-group-item"><strong>Resultado:</strong> @item.Resultado?.ResultadoId</li>
-                    <li class="list-group-item"><strong>Equipo Local:</strong> @item.EquipoLocal?.EquipoId</li>
-                    <li class="list-group-item"><strong>Equipo Visitante:</strong> @item.EquipoVisitante?.EquipoId</li>
-                    <li class="list-group-item"><strong>Tabla Posiciones Local:</strong> @item.TablaPosicionesLocal?.Id</li>
-                    <li class="list-group-item"><strong>Tabla Posiciones Visitante:</strong> @item.TablaPosicionesVisitante?.Id</li>
+                    <li class="list-group-item">
+                        <strong>Fecha de Creación:</strong> @item.FechaCreacion.ToString("dd/MM/yyyy")
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Partido:</strong> @item.Partido?.PartidoId
+                        @if (item.Partido != null)
+                        {
+                            <span class="badge bg-secondary ms-2">@item.Partido.FechaHora.ToString("dd/MM HH:mm")</span>
+                        }
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Resultado:</strong>
+                        @if (item.Resultado != null)
+                        {
+                            <span class="badge bg-success">
+                                @item.Resultado.PuntosLocal
+                                -
+                                @item.Resultado.PuntosVisitante
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Sin resultado</span>
+                        }
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Equipo Local:</strong>
+                        @item.EquipoLocal?.Nombre
+                        @if (item.TablaPosicionesLocal != null)
+                        {
+                            <span class="badge bg-primary ms-2">Pos: @item.TablaPosicionesLocal.Id</span>
+                        }
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Equipo Visitante:</strong>
+                        @item.EquipoVisitante?.Nombre
+                        @if (item.TablaPosicionesVisitante != null)
+                        {
+                            <span class="badge bg-primary ms-2">Pos: @item.TablaPosicionesVisitante.Id</span>
+                        }
+                    </li>
                 </ul>
                 <div class="d-flex justify-content-center gap-2">
                     <a asp-action="Edit" asp-route-id="@item.BracketId" class="btn btn-sm btn-warning">Editar</a>
