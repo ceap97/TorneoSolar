@@ -1,0 +1,66 @@
+﻿@* @model IEnumerable<TorneoSolar.Models.BracketMatch>
+@{
+    ViewData["Title"] = "Bracket de Playoffs";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="~/css/bracket.css" />
+
+<div class="container my-5">
+    <h2 class="text-center mb-5 bracket-title">🏀 Bracket de Playoffs - Torneo</h2>
+    <div class="bracket-wrapper">
+        <div class="round">
+            <h5>Cuartos de Final</h5>
+            @foreach (var partido in Model.Where(p => p.Ronda == 1))
+            {
+                <div class="match">
+                    <div class="team">
+                        <span class="name">@partido.EquipoLocal</span>
+                        <span class="score">@partido.PuntosLocal</span>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="team">
+                        <span class="name">@partido.EquipoVisitante</span>
+                        <span class="score">@partido.PuntosVisitante</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="round">
+            <h5>Semifinales</h5>
+            @foreach (var partido in Model.Where(p => p.Ronda == 2))
+            {
+                <div class="match">
+                    <div class="team">
+                        <span class="name">@partido.EquipoLocal</span>
+                        <span class="score">@partido.PuntosLocal</span>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="team">
+                        <span class="name">@partido.EquipoVisitante</span>
+                        <span class="score">@partido.PuntosVisitante</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="round final">
+            <h5>Final</h5>
+            @foreach (var partido in Model.Where(p => p.Ronda == 3))
+            {
+                <div class="match final-match">
+                    <div class="team">
+                        <span class="name">@partido.EquipoLocal</span>
+                        <span class="score">@partido.PuntosLocal</span>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="team">
+                        <span class="name">@partido.EquipoVisitante</span>
+                        <span class="score">@partido.PuntosVisitante</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+ *@

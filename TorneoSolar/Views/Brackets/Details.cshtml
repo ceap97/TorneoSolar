@@ -1,0 +1,38 @@
+﻿@model TorneoSolar.Models.Bracket
+
+@{
+    ViewData["Title"] = "Detalles del Bracket";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+<h1 class="text-center mb-4">Detalles del Bracket</h1>
+
+<div class="d-flex justify-content-center">
+    <div class="card shadow-sm" style="width: 500px; max-width: 100%;">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-5">Ronda</dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.Ronda)</dd>
+                <dt class="col-sm-5">Fecha de Creación</dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.FechaCreacion)</dd>
+                <dt class="col-sm-5">Partido</dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.Partido.PartidoId)</dd>
+                <dt class="col-sm-5">Resultado</dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.Resultado.ResultadoId)</dd>
+                <dt class="col-sm-5">Equipo Local</dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.EquipoLocal.EquipoId)</dd>
+                <dt class="col-sm-5">Equipo Visitante</dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.EquipoVisitante.EquipoId)</dd>
+                <dt class="col-sm-5">Tabla Posiciones Local</dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.TablaPosicionesLocal.Id)</dd>
+                <dt class="col-sm-5">Tabla Posiciones Visitante</dt>
+                <dd class="col-sm-7">@Html.DisplayFor(model => model.TablaPosicionesVisitante.Id)</dd>
+            </dl>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-3">
+    <a asp-action="Edit" asp-route-id="@Model?.BracketId" class="btn btn-primary me-2">Editar</a>
+    <a asp-action="Index" class="btn btn-link">Volver a la lista</a>
+</div>

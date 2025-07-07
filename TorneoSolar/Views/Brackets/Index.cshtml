@@ -1,0 +1,39 @@
+﻿@model IEnumerable<TorneoSolar.Models.Bracket>
+
+@{
+    ViewData["Title"] = "Brackets";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+<h1 class="text-center mb-4">Brackets</h1>
+
+<div class="text-center mb-4">
+    <a asp-action="Create" class="btn btn-primary">Crear Nuevo Bracket</a>
+</div>
+
+<div class="d-flex flex-wrap justify-content-center">
+    @foreach (var item in Model)
+    {
+        <div class="card shadow-sm m-2" style="width: 420px; max-width: 100%;">
+            <div class="card-body">
+                <h5 class="card-title text-center text-uppercase fw-bold mb-3">
+                    Ronda: @item.Ronda
+                </h5>
+                <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item"><strong>Fecha de Creación:</strong> @item.FechaCreacion.ToString("dd/MM/yyyy")</li>
+                    <li class="list-group-item"><strong>Partido:</strong> @item.Partido?.PartidoId</li>
+                    <li class="list-group-item"><strong>Resultado:</strong> @item.Resultado?.ResultadoId</li>
+                    <li class="list-group-item"><strong>Equipo Local:</strong> @item.EquipoLocal?.EquipoId</li>
+                    <li class="list-group-item"><strong>Equipo Visitante:</strong> @item.EquipoVisitante?.EquipoId</li>
+                    <li class="list-group-item"><strong>Tabla Posiciones Local:</strong> @item.TablaPosicionesLocal?.Id</li>
+                    <li class="list-group-item"><strong>Tabla Posiciones Visitante:</strong> @item.TablaPosicionesVisitante?.Id</li>
+                </ul>
+                <div class="d-flex justify-content-center gap-2">
+                    <a asp-action="Edit" asp-route-id="@item.BracketId" class="btn btn-sm btn-warning">Editar</a>
+                    <a asp-action="Details" asp-route-id="@item.BracketId" class="btn btn-sm btn-info text-white">Detalles</a>
+                    <a asp-action="Delete" asp-route-id="@item.BracketId" class="btn btn-sm btn-danger">Eliminar</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

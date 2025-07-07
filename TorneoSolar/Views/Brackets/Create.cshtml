@@ -1,0 +1,101 @@
+﻿@model TorneoSolar.Models.Bracket
+
+@using Newtonsoft.Json
+
+@{
+    ViewData["Title"] = "Crear Bracket";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+<h1 class="text-center mb-4">Crear Bracket</h1>
+
+<div class="d-flex justify-content-center">
+    <div class="card shadow-sm" style="width: 500px; max-width: 100%;">
+        <div class="card-body">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <div class="mb-3">
+                    <label asp-for="EquipoLocalId" class="form-label"></label>
+                    <select asp-for="EquipoLocalId" class="form-select" asp-items="ViewBag.EquipoLocalId" id="equipoLocal"></select>
+                    <div class="form-text" id="posicionLocal"></div>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="EquipoVisitanteId" class="form-label"></label>
+                    <select asp-for="EquipoVisitanteId" class="form-select" asp-items="ViewBag.EquipoVisitanteId" id="equipoVisitante"></select>
+                    <div class="form-text" id="posicionVisitante"></div>
+                </div>
+                <!-- Inputs ocultos para enviar los IDs de las posiciones -->
+                <input type="hidden" asp-for="TablaPosicionesLocalId" id="TablaPosicionesLocalId" />
+                <input type="hidden" asp-for="TablaPosicionesVisitanteId" id="TablaPosicionesVisitanteId" />
+
+                <div class="mb-3">
+                    <label asp-for="Ronda" class="form-label"></label>
+                    <select asp-for="Ronda" class="form-select" asp-items="ViewBag.Rondas"></select>
+                    <span asp-validation-for="Ronda" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label for="FechaHora" class="form-label">Fecha y hora del partido</label>
+                    <input type="datetime-local" name="FechaHora" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label for="Ubicacion" class="form-label">Lugar del partido</label>
+                    <input type="text" name="Ubicacion" class="form-control" maxlength="100" required />
+                </div>
+
+                <!-- Eliminado el campo de FechaCreacion, se asigna en el controlador -->
+
+                <div class="d-grid">
+                    <input type="submit" value="Crear" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-3">
+    <a asp-action="Index" class="btn btn-link">Volver a la lista</a>
+</div>
+
+@section Scripts {
+    <script>
+        // Diccionario EquipoId -> { Posicion, Nombre }
+        const posiciones = @Html.Raw(JsonConvert.SerializeObject(ViewBag.PosicionesEquipos));
+        // Diccionario EquipoId -> Id de TablaPosiciones
+        const posicionesIds = @Html.Raw(JsonConvert.SerializeObject(ViewBag.PosicionesIds));
+
+        function mostrarPosicion(equipoId, targetId) {
+            const info = posiciones[equipoId];
+            if (info) {
+                document.getElementById(targetId).innerText = `Posición actual: ${info.Posicion} (${info.Nombre})`;
+            } else {
+                document.getElementById(targetId).innerText = '';
+            }
+        }
+
+        function actualizarTablaPosicion(equipoId, inputId) {
+            const tablaPosId = posicionesIds[equipoId];
+            document.getElementById(inputId).value = tablaPosId ? tablaPosId : '';
+        }
+
+        document.getElementById('equipoLocal').addEventListener('change', function () {
+            mostrarPosicion(this.value, 'posicionLocal');
+            actualizarTablaPosicion(this.value, 'TablaPosicionesLocalId');
+        });
+        document.getElementById('equipoVisitante').addEventListener('change', function () {
+            mostrarPosicion(this.value, 'posicionVisitante');
+            actualizarTablaPosicion(this.value, 'TablaPosicionesVisitanteId');
+        });
+
+        // Inicializar al cargar la página
+        window.addEventListener('DOMContentLoaded', function () {
+            mostrarPosicion(document.getElementById('equipoLocal').value, 'posicionLocal');
+            mostrarPosicion(document.getElementById('equipoVisitante').value, 'posicionVisitante');
+            actualizarTablaPosicion(document.getElementById('equipoLocal').value, 'TablaPosicionesLocalId');
+            actualizarTablaPosicion(document.getElementById('equipoVisitante').value, 'TablaPosicionesVisitanteId');
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
