@@ -1,4 +1,5 @@
-﻿using System;
+﻿﻿#nullable enable
+using System;
 
 namespace TorneoSolar.Models;
 
@@ -15,12 +16,14 @@ namespace TorneoSolar.Models;
         public int? TablaPosicionesVisitanteId { get; set; }
         public DateTime FechaCreacion { get; set; }
 
-        public virtual Partido Partido { get; set; }
+#pragma warning disable CS8632 // Anotaciones de referencia anulable fuera de contexto #nullable
+    public virtual Partido Partido { get; set; } = null!;
         public virtual ResultadosPartido? Resultado { get; set; }
-        public virtual Equipo EquipoLocal { get; set; }
-        public virtual Equipo EquipoVisitante { get; set; }
+    public virtual Equipo EquipoLocal { get; set; } = null!;
+    public virtual Equipo EquipoVisitante { get; set; } = null!;
         public virtual TablaPosiciones? TablaPosicionesLocal { get; set; }
         public virtual TablaPosiciones? TablaPosicionesVisitante { get; set; }
+#pragma warning restore CS8632
     }
 
 

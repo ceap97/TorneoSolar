@@ -15,15 +15,16 @@ namespace TorneoSolar.Controllers
     public class EquiposController : Controller
     {
         private readonly TorneoSolarContext _context;
+        private readonly ILogger<EquiposController> _logger;
         private readonly string _uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/equipos");
         private const string FromEmail = "solarbaclub@gmail.com";
         private const string FromName = "Torneo Solar";
         private const string FromPassword = "wldc phxl eski qkyd\r\n"; // Usa configuración segura en producción
 
-
-        public EquiposController(TorneoSolarContext context)
+        public EquiposController(TorneoSolarContext context, ILogger<EquiposController> logger)
         {
             _context = context;
+            _logger = logger;
         }
         [Authorize]
 
@@ -59,6 +60,8 @@ namespace TorneoSolar.Controllers
             }
             catch
             {
+                // Registrar fallo de envío de correo, pero no interrumpir el flujo principal
+                _logger.LogWarning("Fallo al enviar correo a {Destinatario} con asunto {Asunto}", destinatario, asunto);
                 return false;
             }
         }
@@ -67,45 +70,53 @@ namespace TorneoSolar.Controllers
         [HttpPost]
         public async Task<IActionResult> DenegarSolicitud(int id)
         {
-            var solicitud = await _context.SolicitudesEquipos.FindAsync(id);
-            if (solicitud == null)
+            try
             {
-                return NotFound();
-            }
+                var solicitud = await _context.SolicitudesEquipos.FindAsync(id);
+                if (solicitud == null)
+                {
+                    return NotFound();
+                }
 
-            // Determinar el motivo del rechazo
-            string motivo;
-            if (string.IsNullOrEmpty(solicitud.Planilla) && string.IsNullOrEmpty(solicitud.Logo))
+                // Determinar el motivo del rechazo
+                string motivo;
+                if (string.IsNullOrEmpty(solicitud.Planilla) && string.IsNullOrEmpty(solicitud.Logo))
+                {
+                    motivo = "Tu solicitud fue rechazada porque no adjuntaste ni el logo ni la planilla del equipo. Por favor, asegúrate de adjuntar ambos archivos al volver a intentarlo.";
+                }
+                else
+                {
+                    motivo = "Tu solicitud fue rechazada. Por favor, revisa los datos y vuelve a intentarlo.";
+                }
+
+                // Enviar correo de notificación
+                if (!string.IsNullOrEmpty(solicitud.Correo))
+                {
+                    var subject = "Solicitud de registro de equipo denegada";
+                    var body = $@"
+                        <p>Hola {solicitud.NombreEncargado},</p>
+                        <p>{motivo}</p>
+                        <p>Equipo: <strong>{solicitud.Nombre}</strong></p>
+                        <p>Ciudad: <strong>{solicitud.Ciudad}</strong></p>
+                        <p>Fecha de solicitud: <strong>{solicitud.FechaSolicitud?.ToString("g")}</strong></p>
+                        <p>Atentamente,<br/>El equipo de Torneo Solar</p>
+                    ";
+
+                    await EnviarCorreoAsync(solicitud.Correo, solicitud.NombreEncargado, subject, body);
+                }
+
+                // Eliminar la solicitud
+                _context.SolicitudesEquipos.Remove(solicitud);
+                await _context.SaveChangesAsync();
+
+                TempData["Aprobado"] = "La solicitud fue denegada y se notificó al solicitante.";
+                return RedirectToAction(nameof(Solicitudes));
+            }
+            catch (Exception ex)
             {
-                motivo = "Tu solicitud fue rechazada porque no adjuntaste ni el logo ni la planilla del equipo. Por favor, asegúrate de adjuntar ambos archivos al volver a intentarlo.";
+                _logger.LogError(ex, "Error al denegar solicitud {SolicitudId}", id);
+                return RedirectToAction("Error", "Home");
             }
-            else
-            {
-                motivo = "Tu solicitud fue rechazada. Por favor, revisa los datos y vuelve a intentarlo.";
-            }
-
-            // Enviar correo de notificación
-            if (!string.IsNullOrEmpty(solicitud.Correo))
-            {
-                var subject = "Solicitud de registro de equipo denegada";
-                var body = $@"
-                    <p>Hola {solicitud.NombreEncargado},</p>
-                    <p>{motivo}</p>
-                    <p>Equipo: <strong>{solicitud.Nombre}</strong></p>
-                    <p>Ciudad: <strong>{solicitud.Ciudad}</strong></p>
-                    <p>Fecha de solicitud: <strong>{solicitud.FechaSolicitud?.ToString("g")}</strong></p>
-                    <p>Atentamente,<br/>El equipo de Torneo Solar</p>
-                ";
-
-                await EnviarCorreoAsync(solicitud.Correo, solicitud.NombreEncargado, subject, body);
-            }
-
-            // Eliminar la solicitud
-            _context.SolicitudesEquipos.Remove(solicitud);
-            await _context.SaveChangesAsync();
-
-            TempData["Aprobado"] = "La solicitud fue denegada y se notificó al solicitante.";
-            return RedirectToAction(nameof(Solicitudes));
         }
 
 
@@ -122,52 +133,61 @@ namespace TorneoSolar.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Registro(SolicitudEquipo solicitud, IFormFile logo, IFormFile planilla)
         {
-            if (ModelState.IsValid)
+            try
             {
-                // Guardar logo si se sube
-                if (logo != null && logo.Length > 0)
+                if (ModelState.IsValid)
                 {
-                    var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/solicitudes");
-                    if (!Directory.Exists(uploadPath))
-                        Directory.CreateDirectory(uploadPath);
-
-                    var fileName = $"{solicitud.Nombre}_{DateTime.Now.Ticks}{Path.GetExtension(logo.FileName)}";
-                    var filePath = Path.Combine(uploadPath, fileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    // Guardar logo si se sube
+                    if (logo != null && logo.Length > 0)
                     {
-                        await logo.CopyToAsync(stream);
+                        var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/solicitudes");
+                        if (!Directory.Exists(uploadPath))
+                            Directory.CreateDirectory(uploadPath);
+
+                        var fileName = $"{solicitud.Nombre}_{DateTime.Now.Ticks}{Path.GetExtension(logo.FileName)}";
+                        var filePath = Path.Combine(uploadPath, fileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await logo.CopyToAsync(stream);
+                        }
+                        solicitud.Logo = $"/images/solicitudes/{fileName}";
                     }
-                    solicitud.Logo = $"/images/solicitudes/{fileName}";
-                }
 
-                // Guardar planilla si se sube
-                if (planilla != null && planilla.Length > 0)
-                {
-                    var planillaPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/planillas/solicitudes");
-                    if (!Directory.Exists(planillaPath))
-                        Directory.CreateDirectory(planillaPath);
-
-                    var planillaFileName = $"{solicitud.Nombre}_{DateTime.Now.Ticks}{Path.GetExtension(planilla.FileName)}";
-                    var planillaFilePath = Path.Combine(planillaPath, planillaFileName);
-
-                    using (var stream = new FileStream(planillaFilePath, FileMode.Create))
+                    // Guardar planilla si se sube
+                    if (planilla != null && planilla.Length > 0)
                     {
-                        await planilla.CopyToAsync(stream);
+                        var planillaPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/planillas/solicitudes");
+                        if (!Directory.Exists(planillaPath))
+                            Directory.CreateDirectory(planillaPath);
+
+                        var planillaFileName = $"{solicitud.Nombre}_{DateTime.Now.Ticks}{Path.GetExtension(planilla.FileName)}";
+                        var planillaFilePath = Path.Combine(planillaPath, planillaFileName);
+
+                        using (var stream = new FileStream(planillaFilePath, FileMode.Create))
+                        {
+                            await planilla.CopyToAsync(stream);
+                        }
+                        solicitud.Planilla = $"/planillas/solicitudes/{planillaFileName}";
                     }
-                    solicitud.Planilla = $"/planillas/solicitudes/{planillaFileName}";
+
+                    solicitud.FechaSolicitud = DateTime.Now;
+                    solicitud.Aprobada = false;
+
+                    _context.SolicitudesEquipos.Add(solicitud);
+                    await _context.SaveChangesAsync();
+
+                    TempData["Mensaje"] = "¡Solicitud enviada! Un administrador revisará tu registro.";
+                    return RedirectToAction("Registro");
                 }
-
-                solicitud.FechaSolicitud = DateTime.Now;
-                solicitud.Aprobada = false;
-
-                _context.SolicitudesEquipos.Add(solicitud);
-                await _context.SaveChangesAsync();
-
-                TempData["Mensaje"] = "¡Solicitud enviada! Un administrador revisará tu registro.";
+                return View(solicitud);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al registrar solicitud de equipo {Nombre}", solicitud?.Nombre);
+                TempData["Mensaje"] = "Ocurrió un error al procesar la solicitud. Intente nuevamente.";
                 return RedirectToAction("Registro");
             }
-            return View(solicitud);
         }
 
 
@@ -175,126 +195,183 @@ namespace TorneoSolar.Controllers
         [Authorize]
         public async Task<IActionResult> Solicitudes()
         {
-            var solicitudes = await _context.SolicitudesEquipos
-                .Where(s => !s.Aprobada)
-                .OrderByDescending(s => s.FechaSolicitud)
-                .ToListAsync();
-            return View(solicitudes);
+            try
+            {
+                var solicitudes = await _context.SolicitudesEquipos
+                    .Where(s => !s.Aprobada)
+                    .OrderByDescending(s => s.FechaSolicitud)
+                    .ToListAsync();
+                return View(solicitudes);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener solicitudes de equipos");
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> AprobarSolicitud(int id)
         {
-            var solicitud = await _context.SolicitudesEquipos.FindAsync(id);
-            if (solicitud == null) return NotFound();
-
-            // Crear el equipo real
-            var equipo = new Equipo
-            {
-                Nombre = solicitud.Nombre,
-                Ciudad = solicitud.Ciudad,
-                Logo = solicitud.Logo
-            };
-            _context.Equipos.Add(equipo);
-
-            solicitud.Aprobada = true;
-            _context.SolicitudesEquipos.Update(solicitud);
-
-            await _context.SaveChangesAsync();
-
-            // Enviar correo de notificación
             try
             {
-                var fromAddress = new MailAddress("solarbaclub@gmail.com", "Torneo Solar");
-                var toAddress = new MailAddress(solicitud.Correo, solicitud.NombreEncargado);
-                const string fromPassword = "wldc phxl eski qkyd\r\n"; // Usa configuración segura en producción
-                const string subject = "¡Tu equipo ha sido aprobado!";
-                string body = $"Hola {solicitud.NombreEncargado},\n\n" +
-                              $"Tu equipo \"{solicitud.Nombre}\" ha sido aprobado para participar en el Torneo Solar.\n\n" +
-                              $"¡Bienvenido!\n\n" +
-                              $"Saludos,\nTorneo Solar";
+                var solicitud = await _context.SolicitudesEquipos.FindAsync(id);
+                if (solicitud == null) return NotFound();
 
-                var smtp = new SmtpClient
+                // Crear el equipo real
+                var equipo = new Equipo
                 {
-                    Host = "smtp.gmail.com",
-                    Port = 587,
-                    EnableSsl = true,
-                    DeliveryMethod = SmtpDeliveryMethod.Network,
-                    UseDefaultCredentials = false,
-                    Credentials = new NetworkCredential("solarbaclub@gmail.com", fromPassword) // El usuario es el correo completo
+                    Nombre = solicitud.Nombre,
+                    Ciudad = solicitud.Ciudad,
+                    Logo = solicitud.Logo
                 };
-                using (var message = new MailMessage(fromAddress, toAddress)
+                _context.Equipos.Add(equipo);
+
+                solicitud.Aprobada = true;
+                _context.SolicitudesEquipos.Update(solicitud);
+
+                await _context.SaveChangesAsync();
+
+                // Enviar correo de notificación
+                try
                 {
-                    Subject = subject,
-                    Body = body
-                })
-                {
-                    await smtp.SendMailAsync(message);
+                    var fromAddress = new MailAddress("solarbaclub@gmail.com", "Torneo Solar");
+                    var toAddress = new MailAddress(solicitud.Correo, solicitud.NombreEncargado);
+                    const string fromPassword = "wldc phxl eski qkyd\r\n"; // Usa configuración segura en producción
+                    const string subject = "¡Tu equipo ha sido aprobado!";
+                    string body = $"Hola {solicitud.NombreEncargado},\n\n" +
+                                  $"Tu equipo \"{solicitud.Nombre}\" ha sido aprobado para participar en el Torneo Solar.\n\n" +
+                                  $"¡Bienvenido!\n\n" +
+                                  $"Saludos,\nTorneo Solar";
+
+                    var smtp = new SmtpClient
+                    {
+                        Host = "smtp.gmail.com",
+                        Port = 587,
+                        EnableSsl = true,
+                        DeliveryMethod = SmtpDeliveryMethod.Network,
+                        UseDefaultCredentials = false,
+                        Credentials = new NetworkCredential("solarbaclub@gmail.com", fromPassword) // El usuario es el correo completo
+                    };
+                    using (var message = new MailMessage(fromAddress, toAddress)
+                    {
+                        Subject = subject,
+                        Body = body
+                    })
+                    {
+                        await smtp.SendMailAsync(message);
+                    }
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Aprobado equipo pero falló envío de correo para solicitud {SolicitudId}", id);
+                    TempData["Aprobado"] = "El equipo ha sido aprobado, pero no se pudo enviar el correo.";
+                    return RedirectToAction("Solicitudes");
+                }
+
+                TempData["Aprobado"] = "El equipo ha sido aprobado exitosamente y se notificó al correo del encargado.";
+                return RedirectToAction("Solicitudes");
             }
             catch (Exception ex)
             {
-                TempData["Aprobado"] = "El equipo ha sido aprobado, pero no se pudo enviar el correo: " + ex.Message;
-                return RedirectToAction("Solicitudes");
+                _logger.LogError(ex, "Error al aprobar solicitud {SolicitudId}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            TempData["Aprobado"] = "El equipo ha sido aprobado exitosamente y se notificó al correo del encargado.";
-            return RedirectToAction("Solicitudes");
         }
 
 
         public async Task<IActionResult> Partidos(int equipoId)
         {
-            var partidos = await _context.Partidos
-                .Include(p => p.LocalEquipo)
-                .Include(p => p.VisitanteEquipo)
-                .Include(p => p.ResultadosPartido)
-                .Where(p => p.LocalEquipoId == equipoId || p.VisitanteEquipoId == equipoId)
-                .OrderByDescending(p => p.FechaHora)
-                .ToListAsync();
+            try
+            {
+                var partidos = await _context.Partidos
+                    .Include(p => p.LocalEquipo)
+                    .Include(p => p.VisitanteEquipo)
+                    .Include(p => p.ResultadosPartido)
+                    .Where(p => p.LocalEquipoId == equipoId || p.VisitanteEquipoId == equipoId)
+                    .OrderByDescending(p => p.FechaHora)
+                    .ToListAsync();
 
-            var equipo = await _context.Equipos.FindAsync(equipoId);
-            ViewBag.EquipoNombre = equipo?.Nombre ?? "Equipo";
+                var equipo = await _context.Equipos.FindAsync(equipoId);
+                ViewBag.EquipoNombre = equipo?.Nombre ?? "Equipo";
 
-            return View(partidos);
+                return View(partidos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener partidos del equipo {EquipoId}", equipoId);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         // GET: Equipos
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Equipos.ToListAsync());
+            try
+            {
+                return View(await _context.Equipos.ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en Index de Equipos");
+                return RedirectToAction("Error", "Home");
+            }
         }
         [Authorize]
         public async Task<IActionResult> Index1()
         {
-            return View(await _context.Equipos.ToListAsync());
+            try
+            {
+                return View(await _context.Equipos.ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en Index1 de Equipos");
+                return RedirectToAction("Error", "Home");
+            }
         }
         [Authorize]
 
         // GET: Equipos/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var equipo = await _context.Equipos
-                .FirstOrDefaultAsync(m => m.EquipoId == id);
-            if (equipo == null)
+                var equipo = await _context.Equipos
+                    .FirstOrDefaultAsync(m => m.EquipoId == id);
+                if (equipo == null)
+                {
+                    return NotFound();
+                }
+
+                return View(equipo);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error al obtener detalles del equipo {EquipoId}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            return View(equipo);
         }
         [Authorize]
 
         // GET: Equipos/Create
         public IActionResult Create()
         {
-            return View();
+            try
+            {
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar vista Create de Equipos");
+                return RedirectToAction("Error", "Home");
+            }
         }
         [Authorize]
         [HttpPost]
@@ -331,11 +408,13 @@ namespace TorneoSolar.Controllers
             catch (IOException ioEx)
             {
                 // Manejar errores específicos de IO
+                _logger.LogError(ioEx, "Error de IO al crear equipo {Nombre}", equipo?.Nombre);
                 return BadRequest(new { message = "Error al guardar el archivo: " + ioEx.Message });
             }
             catch (Exception ex)
             {
                 // Manejar otros tipos de errores
+                _logger.LogError(ex, "Error general al crear equipo {Nombre}", equipo?.Nombre);
                 return BadRequest(new { message = "Error al crear el equipo: " + ex.Message });
             }
         }
@@ -345,69 +424,85 @@ namespace TorneoSolar.Controllers
         // GET: Equipos/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var equipo = await _context.Equipos.FindAsync(id);
-            if (equipo == null)
-            {
-                return NotFound();
+                var equipo = await _context.Equipos.FindAsync(id);
+                if (equipo == null)
+                {
+                    return NotFound();
+                }
+                return View(equipo);
             }
-            return View(equipo);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar vista Edit de equipo {EquipoId}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("EquipoId,Nombre,Ciudad,Logo")] Equipo equipo, IFormFile logo)
         {
-            if (id != equipo.EquipoId)
+            try
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                if (id != equipo.EquipoId)
                 {
-                    if (logo != null)
-                    {
-                        var fileName = $"{equipo.Nombre}.jpeg";  // Usar el nombre del equipo como nombre del archivo
-                        var filePath = Path.Combine(_uploadPath, fileName);
+                    return NotFound();
+                }
 
-                        // Crear el directorio si no existe
-                        if (!Directory.Exists(_uploadPath))
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        if (logo != null)
                         {
-                            Directory.CreateDirectory(_uploadPath);
+                            var fileName = $"{equipo.Nombre}.jpeg";  // Usar el nombre del equipo como nombre del archivo
+                            var filePath = Path.Combine(_uploadPath, fileName);
+
+                            // Crear el directorio si no existe
+                            if (!Directory.Exists(_uploadPath))
+                            {
+                                Directory.CreateDirectory(_uploadPath);
+                            }
+
+                            // Guardar la imagen en el servidor
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await logo.CopyToAsync(stream);
+                            }
+
+                            equipo.Logo = $"/images/equipos/{fileName}";  // Guardar la ruta relativa en la base de datos
                         }
 
-                        // Guardar la imagen en el servidor
-                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        _context.Update(equipo);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!EquipoExists(equipo.EquipoId))
                         {
-                            await logo.CopyToAsync(stream);
+                            return NotFound();
                         }
-
-                        equipo.Logo = $"/images/equipos/{fileName}";  // Guardar la ruta relativa en la base de datos
+                        else
+                        {
+                            throw;
+                        }
                     }
-
-                    _context.Update(equipo);
-                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index1));
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EquipoExists(equipo.EquipoId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index1));
+                return View(equipo);
             }
-            return View(equipo);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al editar equipo {EquipoId}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         [Authorize]
@@ -415,19 +510,27 @@ namespace TorneoSolar.Controllers
         // GET: Equipos/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var equipo = await _context.Equipos
-                .FirstOrDefaultAsync(m => m.EquipoId == id);
-            if (equipo == null)
+                var equipo = await _context.Equipos
+                    .FirstOrDefaultAsync(m => m.EquipoId == id);
+                if (equipo == null)
+                {
+                    return NotFound();
+                }
+
+                return View(equipo);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error al cargar vista Delete de equipo {EquipoId}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            return View(equipo);
         }
         [Authorize]
 
@@ -436,14 +539,22 @@ namespace TorneoSolar.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var equipo = await _context.Equipos.FindAsync(id);
-            if (equipo != null)
+            try
             {
-                _context.Equipos.Remove(equipo);
-            }
+                var equipo = await _context.Equipos.FindAsync(id);
+                if (equipo != null)
+                {
+                    _context.Equipos.Remove(equipo);
+                }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index1));
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index1));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar equipo {EquipoId}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         private bool EquipoExists(int id)

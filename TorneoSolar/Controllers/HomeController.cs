@@ -21,31 +21,39 @@ namespace TorneoSolar.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // Incrementar el contador de visitantes
-            var visitorCount = await _context.VisitorCounts.FirstOrDefaultAsync();
-            if (visitorCount != null)
+            try
             {
-                visitorCount.Count++;
-                _context.Update(visitorCount);
-                await _context.SaveChangesAsync();
+                // Incrementar el contador de visitantes
+                var visitorCount = await _context.VisitorCounts.FirstOrDefaultAsync();
+                if (visitorCount != null)
+                {
+                    visitorCount.Count++;
+                    _context.Update(visitorCount);
+                    await _context.SaveChangesAsync();
+                }
+
+                var noticias = await _context.Noticias.ToListAsync();
+                var ultimosResultados = await _context.Partidos
+                    .Include(p => p.LocalEquipo)
+                    .Include(p => p.VisitanteEquipo)
+                    .Include(p => p.ResultadosPartido)
+                    .OrderByDescending(p => p.FechaHora)
+                    .Take(5)
+                    .ToListAsync();
+
+                var viewModel = new HomeViewModel
+                {
+                    Noticias = noticias,
+                    UltimosResultados = ultimosResultados
+                };
+
+                return View(viewModel);
             }
-
-            var noticias = await _context.Noticias.ToListAsync();
-            var ultimosResultados = await _context.Partidos
-                .Include(p => p.LocalEquipo)
-                .Include(p => p.VisitanteEquipo)
-                .Include(p => p.ResultadosPartido)
-                .OrderByDescending(p => p.FechaHora)
-                .Take(5)
-                .ToListAsync();
-
-            var viewModel = new HomeViewModel
+            catch (Exception ex)
             {
-                Noticias = noticias,
-                UltimosResultados = ultimosResultados
-            };
-
-            return View(viewModel);
+                _logger.LogError(ex, "Error en Home/Index");
+                return RedirectToAction("Error");
+            }
         }
         [Authorize]
         public IActionResult Admin()
@@ -54,13 +62,28 @@ namespace TorneoSolar.Controllers
         }
         public async Task<IActionResult> CerrarSesion()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            return RedirectToAction("Index", "Home");
+            try
+            {
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cerrar sesión");
+                return RedirectToAction("Error");
+            }
         }
         public IActionResult Privacy()
         {
-            return View();
+            try
+            {
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar Privacy");
+                return RedirectToAction("Error");
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -12,114 +12,140 @@ namespace TorneoSolar.Controllers
     public class BracketsController : Controller
     {
         private readonly TorneoSolarContext _context;
+        private readonly ILogger<BracketsController> _logger;
 
-        public BracketsController(TorneoSolarContext context)
+        public BracketsController(TorneoSolarContext context, ILogger<BracketsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Brackets
         public async Task<IActionResult> Index()
         {
-            var brackets = await _context.Brackets
-                .Include(b => b.EquipoLocal)
-                .Include(b => b.EquipoVisitante)
-                .Include(b => b.Partido)
-                .Include(b => b.Resultado)
-                .Include(b => b.TablaPosicionesLocal)
-                .Include(b => b.TablaPosicionesVisitante)
-                .ToListAsync();
+            try
+            {
+                var brackets = await _context.Brackets
+                    .Include(b => b.EquipoLocal)
+                    .Include(b => b.EquipoVisitante)
+                    .Include(b => b.Partido)
+                    .Include(b => b.Resultado)
+                    .Include(b => b.TablaPosicionesLocal)
+                    .Include(b => b.TablaPosicionesVisitante)
+                    .ToListAsync();
 
-            // Diccionario de posiciones reales (por ranking)
-            var tabla = await _context.TablaPosiciones
-                .Include(tp => tp.Equipo)
-                .OrderByDescending(x => (x.PG * 1.0 / (x.PJ == 0 ? 1 : x.PJ)))
-                .ThenByDescending(x => x.PtsFavor - x.PtsContra)
-                .ToListAsync();
+                // Diccionario de posiciones reales (por ranking)
+                var tabla = await _context.TablaPosiciones
+                    .Include(tp => tp.Equipo)
+                    .OrderByDescending(x => (x.PG * 1.0 / (x.PJ == 0 ? 1 : x.PJ)))
+                    .ThenByDescending(x => x.PtsFavor - x.PtsContra)
+                    .ToListAsync();
 
-            var posiciones = tabla
-                .Select((tp, idx) => new { tp.EquipoId, Posicion = idx + 1 })
-                .ToDictionary(x => x.EquipoId, x => x.Posicion);
+                var posiciones = tabla
+                    .Select((tp, idx) => new { tp.EquipoId, Posicion = idx + 1 })
+                    .ToDictionary(x => x.EquipoId, x => x.Posicion);
 
-            ViewBag.Posiciones = posiciones;
+                ViewBag.Posiciones = posiciones;
 
-            return View(brackets);
+                return View(brackets);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en Brackets/Index");
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         // GET: Brackets/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var bracket = await _context.Brackets
-                .Include(b => b.EquipoLocal)
-                .Include(b => b.EquipoVisitante)
-                .Include(b => b.Partido)
-                .Include(b => b.Resultado)
-                .Include(b => b.TablaPosicionesLocal)
-                .Include(b => b.TablaPosicionesVisitante)
-                .FirstOrDefaultAsync(m => m.BracketId == id);
-            if (bracket == null)
+                var bracket = await _context.Brackets
+                    .Include(b => b.EquipoLocal)
+                    .Include(b => b.EquipoVisitante)
+                    .Include(b => b.Partido)
+                    .Include(b => b.Resultado)
+                    .Include(b => b.TablaPosicionesLocal)
+                    .Include(b => b.TablaPosicionesVisitante)
+                    .FirstOrDefaultAsync(m => m.BracketId == id);
+                if (bracket == null)
+                {
+                    return NotFound();
+                }
+
+                return View(bracket);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error en Brackets/Details {Id}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            return View(bracket);
         }
 
         // GET: Brackets/Create
         public IActionResult Create()
         {
-            var tabla = _context.TablaPosiciones
-                .Include(tp => tp.Equipo)
-                .OrderByDescending(x => (x.PG * 1.0 / (x.PJ == 0 ? 1 : x.PJ)))
-                .ThenByDescending(x => x.PtsFavor - x.PtsContra)
-                .ToList();
-
-            var posiciones = tabla
-                .Select((tp, idx) => new { tp.EquipoId, Posicion = idx + 1, Nombre = tp.Equipo.Nombre })
-                .ToDictionary(x => x.EquipoId, x => new { x.Posicion, x.Nombre });
-
-            var posicionesIds = tabla.ToDictionary(tp => tp.EquipoId, tp => tp.Id);
-
-            ViewBag.PosicionesEquipos = posiciones;
-            ViewBag.PosicionesIds = posicionesIds;
-
-            var top8 = tabla.Take(8).ToList();
-            var cruces = new List<(int localId, int visitanteId)>();
-            int n = top8.Count;
-            for (int i = 0; i < n / 2; i++)
+            try
             {
-                cruces.Add((top8[i].EquipoId, top8[n - 1 - i].EquipoId));
+                var tabla = _context.TablaPosiciones
+                    .Include(tp => tp.Equipo)
+                    .OrderByDescending(x => (x.PG * 1.0 / (x.PJ == 0 ? 1 : x.PJ)))
+                    .ThenByDescending(x => x.PtsFavor - x.PtsContra)
+                    .ToList();
+
+                var posiciones = tabla
+                    .Select((tp, idx) => new { tp.EquipoId, Posicion = idx + 1, Nombre = tp.Equipo.Nombre })
+                    .ToDictionary(x => x.EquipoId, x => new { x.Posicion, x.Nombre });
+
+                var posicionesIds = tabla.ToDictionary(tp => tp.EquipoId, tp => tp.Id);
+
+                ViewBag.PosicionesEquipos = posiciones;
+                ViewBag.PosicionesIds = posicionesIds;
+
+                var top8 = tabla.Take(8).ToList();
+                var cruces = new List<(int localId, int visitanteId)>();
+                int n = top8.Count;
+                for (int i = 0; i < n / 2; i++)
+                {
+                    cruces.Add((top8[i].EquipoId, top8[n - 1 - i].EquipoId));
+                }
+
+                var rondas = new List<SelectListItem>
+                {
+                    new SelectListItem { Value = "1", Text = "Cuartos de final" },
+                    new SelectListItem { Value = "2", Text = "Semifinal" },
+                    new SelectListItem { Value = "3", Text = "Final" }
+                };
+
+                bool esPrimeraVez = !_context.Brackets.Any();
+                ViewBag.EsPrimeraVez = esPrimeraVez;
+                ViewBag.Rondas = esPrimeraVez
+                    ? rondas.Where(r => r.Value == "1").ToList()
+                    : rondas;
+
+                var equiposLocales = cruces.Select(c => c.localId).ToList();
+                var equiposVisitantes = cruces.Select(c => c.visitanteId).ToList();
+
+                ViewData["EquiposCruce"] = cruces;
+                ViewData["EquipoLocalId"] = new SelectList(_context.Equipos.Where(e => equiposLocales.Contains(e.EquipoId)), "EquipoId", "Nombre");
+                ViewData["EquipoVisitanteId"] = new SelectList(_context.Equipos.Where(e => equiposVisitantes.Contains(e.EquipoId)), "EquipoId", "Nombre");
+                ViewData["PartidoId"] = new SelectList(_context.Partidos, "PartidoId", "PartidoId");
+                ViewData["ResultadoId"] = new SelectList(_context.ResultadosPartidos, "ResultadoId", "ResultadoId");
+                ViewData["TablaPosicionesLocalId"] = new SelectList(_context.TablaPosiciones, "Id", "Id");
+                ViewData["TablaPosicionesVisitanteId"] = new SelectList(_context.TablaPosiciones, "Id", "Id");
+                return View();
             }
-
-            var rondas = new List<SelectListItem>
+            catch (Exception ex)
             {
-                new SelectListItem { Value = "1", Text = "Cuartos de final" },
-                new SelectListItem { Value = "2", Text = "Semifinal" },
-                new SelectListItem { Value = "3", Text = "Final" }
-            };
-
-            bool esPrimeraVez = !_context.Brackets.Any();
-            ViewBag.EsPrimeraVez = esPrimeraVez;
-            ViewBag.Rondas = esPrimeraVez
-                ? rondas.Where(r => r.Value == "1").ToList()
-                : rondas;
-
-            var equiposLocales = cruces.Select(c => c.localId).ToList();
-            var equiposVisitantes = cruces.Select(c => c.visitanteId).ToList();
-
-            ViewData["EquiposCruce"] = cruces;
-            ViewData["EquipoLocalId"] = new SelectList(_context.Equipos.Where(e => equiposLocales.Contains(e.EquipoId)), "EquipoId", "Nombre");
-            ViewData["EquipoVisitanteId"] = new SelectList(_context.Equipos.Where(e => equiposVisitantes.Contains(e.EquipoId)), "EquipoId", "Nombre");
-            ViewData["PartidoId"] = new SelectList(_context.Partidos, "PartidoId", "PartidoId");
-            ViewData["ResultadoId"] = new SelectList(_context.ResultadosPartidos, "ResultadoId", "ResultadoId");
-            ViewData["TablaPosicionesLocalId"] = new SelectList(_context.TablaPosiciones, "Id", "Id");
-            ViewData["TablaPosicionesVisitanteId"] = new SelectList(_context.TablaPosiciones, "Id", "Id");
-            return View();
+                _logger.LogError(ex, "Error al cargar Brackets/Create");
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         [HttpPost]
@@ -129,40 +155,47 @@ namespace TorneoSolar.Controllers
             DateTime FechaHora,
             string Ubicacion)
         {
-            if (!_context.Brackets.Any())
+            try
             {
-                bracket.Ronda = 1;
+                if (!_context.Brackets.Any())
+                {
+                    bracket.Ronda = 1;
+                }
+
+                bracket.FechaCreacion = DateTime.Now;
+
+                if (ModelState.IsValid)
+                {
+                    var partido = new Partido
+                    {
+                        LocalEquipoId = bracket.EquipoLocalId,
+                        VisitanteEquipoId = bracket.EquipoVisitanteId,
+                        FechaHora = FechaHora,
+                        Ubicacion = Ubicacion
+                    };
+                    _context.Partidos.Add(partido);
+                    await _context.SaveChangesAsync();
+
+                    var resultado = new ResultadosPartido
+                    {
+                        PartidoId = partido.PartidoId,
+                        PuntosLocal = 0,
+                        PuntosVisitante = 0
+                    };
+                    _context.ResultadosPartidos.Add(resultado);
+                    await _context.SaveChangesAsync();
+
+                    bracket.PartidoId = partido.PartidoId;
+                    bracket.ResultadoId = resultado.ResultadoId;
+
+                    _context.Add(bracket);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
-
-            bracket.FechaCreacion = DateTime.Now;
-
-            if (ModelState.IsValid)
+            catch (Exception ex)
             {
-                var partido = new Partido
-                {
-                    LocalEquipoId = bracket.EquipoLocalId,
-                    VisitanteEquipoId = bracket.EquipoVisitanteId,
-                    FechaHora = FechaHora,
-                    Ubicacion = Ubicacion
-                };
-                _context.Partidos.Add(partido);
-                await _context.SaveChangesAsync();
-
-                var resultado = new ResultadosPartido
-                {
-                    PartidoId = partido.PartidoId,
-                    PuntosLocal = 0,
-                    PuntosVisitante = 0
-                };
-                _context.ResultadosPartidos.Add(resultado);
-                await _context.SaveChangesAsync();
-
-                bracket.PartidoId = partido.PartidoId;
-                bracket.ResultadoId = resultado.ResultadoId;
-
-                _context.Add(bracket);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                _logger.LogError(ex, "Error al crear Bracket");
             }
 
             // Si hay error, recargar los combos y diccionarios para la vista
@@ -218,20 +251,22 @@ namespace TorneoSolar.Controllers
         // GET: Brackets/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var bracket = await _context.Brackets
-                .Include(b => b.EquipoLocal)
-                .Include(b => b.EquipoVisitante)
-                .FirstOrDefaultAsync(b => b.BracketId == id);
+                var bracket = await _context.Brackets
+                    .Include(b => b.EquipoLocal)
+                    .Include(b => b.EquipoVisitante)
+                    .FirstOrDefaultAsync(b => b.BracketId == id);
 
-            if (bracket == null)
-            {
-                return NotFound();
-            }
+                if (bracket == null)
+                {
+                    return NotFound();
+                }
 
             var tabla = _context.TablaPosiciones
                 .Include(tp => tp.Equipo)
@@ -264,7 +299,13 @@ namespace TorneoSolar.Controllers
             ViewData["TablaPosicionesLocalId"] = new SelectList(_context.TablaPosiciones, "Id", "Id", bracket.TablaPosicionesLocalId);
             ViewData["TablaPosicionesVisitanteId"] = new SelectList(_context.TablaPosiciones, "Id", "Id", bracket.TablaPosicionesVisitanteId);
 
-            return View(bracket);
+                return View(bracket);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar Brackets/Edit {Id}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         // POST: Brackets/Edit/5
@@ -292,6 +333,7 @@ namespace TorneoSolar.Controllers
                     }
                     else
                     {
+                        _logger.LogError("Conflicto de concurrencia al editar Bracket {Id}", bracket.BracketId);
                         throw;
                     }
                 }
@@ -340,90 +382,114 @@ namespace TorneoSolar.Controllers
         // GET: Brackets/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var bracket = await _context.Brackets
-                .Include(b => b.EquipoLocal)
-                .Include(b => b.EquipoVisitante)
-                .Include(b => b.Partido)
-                .Include(b => b.Resultado)
-                .Include(b => b.TablaPosicionesLocal)
-                .Include(b => b.TablaPosicionesVisitante)
-                .FirstOrDefaultAsync(m => m.BracketId == id);
-            if (bracket == null)
+                var bracket = await _context.Brackets
+                    .Include(b => b.EquipoLocal)
+                    .Include(b => b.EquipoVisitante)
+                    .Include(b => b.Partido)
+                    .Include(b => b.Resultado)
+                    .Include(b => b.TablaPosicionesLocal)
+                    .Include(b => b.TablaPosicionesVisitante)
+                    .FirstOrDefaultAsync(m => m.BracketId == id);
+                if (bracket == null)
+                {
+                    return NotFound();
+                }
+
+                return View(bracket);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error al cargar Brackets/Delete {Id}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            return View(bracket);
         }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var bracket = await _context.Brackets
-                .Include(b => b.Resultado)
-                .Include(b => b.Partido)
-                .FirstOrDefaultAsync(b => b.BracketId == id);
-
-            if (bracket != null)
+            try
             {
-                // Eliminar el resultado si existe
-                if (bracket.Resultado != null)
+                var bracket = await _context.Brackets
+                    .Include(b => b.Resultado)
+                    .Include(b => b.Partido)
+                    .FirstOrDefaultAsync(b => b.BracketId == id);
+
+                if (bracket != null)
                 {
-                    _context.ResultadosPartidos.Remove(bracket.Resultado);
+                    // Eliminar el resultado si existe
+                    if (bracket.Resultado != null)
+                    {
+                        _context.ResultadosPartidos.Remove(bracket.Resultado);
+                    }
+
+                    // Eliminar el partido si existe
+                    if (bracket.Partido != null)
+                    {
+                        _context.Partidos.Remove(bracket.Partido);
+                    }
+
+                    // Eliminar el bracket
+                    _context.Brackets.Remove(bracket);
+
+                    await _context.SaveChangesAsync();
                 }
 
-                // Eliminar el partido si existe
-                if (bracket.Partido != null)
-                {
-                    _context.Partidos.Remove(bracket.Partido);
-                }
-
-                // Eliminar el bracket
-                _context.Brackets.Remove(bracket);
-
-                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-
-            return RedirectToAction(nameof(Index));
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar Bracket {Id}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         // --- Index1 (Bracket visual) se mantiene igual ---
         public async Task<IActionResult> Index1()
         {
-            var tabla = await _context.TablaPosiciones
-                .Include(tp => tp.Equipo)
-                .OrderByDescending(x => (x.PG * 1.0 / (x.PJ == 0 ? 1 : x.PJ)))
-                .ThenByDescending(x => x.PtsFavor - x.PtsContra)
-                .ToListAsync();
-
-            var posiciones = tabla
-                .Select((tp, idx) => new { tp.EquipoId, Posicion = idx + 1 })
-                .ToDictionary(x => x.EquipoId, x => x.Posicion);
-
-            var brackets = await _context.Brackets
-                .Include(b => b.EquipoLocal)
-                .Include(b => b.EquipoVisitante)
-                .Include(b => b.Resultado)
-                .ToListAsync();
-
-            var model = brackets.Select(b => new BracketMatch
+            try
             {
-                Ronda = b.Ronda,
-                EquipoLocal = b.EquipoLocal?.Nombre ?? "Por definir",
-                EquipoVisitante = b.EquipoVisitante?.Nombre ?? "Por definir",
-                PuntosLocal = b.Resultado?.PuntosLocal,
-                PuntosVisitante = b.Resultado?.PuntosVisitante,
-                PosicionLocal = b.EquipoLocalId != 0 && posiciones.ContainsKey(b.EquipoLocalId) ? posiciones[b.EquipoLocalId] : null,
-                PosicionVisitante = b.EquipoVisitanteId != 0 && posiciones.ContainsKey(b.EquipoVisitanteId) ? posiciones[b.EquipoVisitanteId] : null
-            }).ToList();
+                var tabla = await _context.TablaPosiciones
+                    .Include(tp => tp.Equipo)
+                    .OrderByDescending(x => (x.PG * 1.0 / (x.PJ == 0 ? 1 : x.PJ)))
+                    .ThenByDescending(x => x.PtsFavor - x.PtsContra)
+                    .ToListAsync();
 
-            return View(model);
+                var posiciones = tabla
+                    .Select((tp, idx) => new { tp.EquipoId, Posicion = idx + 1 })
+                    .ToDictionary(x => x.EquipoId, x => x.Posicion);
+
+                var brackets = await _context.Brackets
+                    .Include(b => b.EquipoLocal)
+                    .Include(b => b.EquipoVisitante)
+                    .Include(b => b.Resultado)
+                    .ToListAsync();
+
+                var model = brackets.Select(b => new BracketMatch
+                {
+                    Ronda = b.Ronda,
+                    EquipoLocal = b.EquipoLocal?.Nombre ?? "Por definir",
+                    EquipoVisitante = b.EquipoVisitante?.Nombre ?? "Por definir",
+                    PuntosLocal = b.Resultado?.PuntosLocal,
+                    PuntosVisitante = b.Resultado?.PuntosVisitante,
+                    PosicionLocal = b.EquipoLocalId != 0 && posiciones.ContainsKey(b.EquipoLocalId) ? posiciones[b.EquipoLocalId] : null,
+                    PosicionVisitante = b.EquipoVisitanteId != 0 && posiciones.ContainsKey(b.EquipoVisitanteId) ? posiciones[b.EquipoVisitanteId] : null
+                }).ToList();
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en Brackets/Index1");
+                return RedirectToAction("Error", "Home");
+            }
         }
     }
 }

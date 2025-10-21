@@ -16,41 +16,67 @@ namespace TorneoSolar.Controllers
     public class UsuariosController : Controller
     {
         private readonly TorneoSolarContext _context;
+        private readonly ILogger<UsuariosController> _logger;
 
-        public UsuariosController(TorneoSolarContext context)
+        public UsuariosController(TorneoSolarContext context, ILogger<UsuariosController> logger)
         {
             _context = context;
+            _logger = logger;
         }
         
 
         // GET: Usuarios
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Usuario.ToListAsync());
+            try
+            {
+                return View(await _context.Usuario.ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en Usuarios/Index");
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         // GET: Usuarios/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var usuario = await _context.Usuario
-                .FirstOrDefaultAsync(m => m.UsuarioId == id);
-            if (usuario == null)
+                var usuario = await _context.Usuario
+                    .FirstOrDefaultAsync(m => m.UsuarioId == id);
+                if (usuario == null)
+                {
+                    return NotFound();
+                }
+
+                return View(usuario);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error en Usuarios/Details {Id}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            return View(usuario);
         }
 
         // GET: Usuarios/Create
         public IActionResult Create()
         {
-            return View();
+            try
+            {
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar Usuarios/Create");
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         // POST: Usuarios/Create
@@ -60,30 +86,46 @@ namespace TorneoSolar.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("UsuarioId,NombreUsuario,Correo,Clave")] Usuario usuario)
         {
-            if (ModelState.IsValid)
+            try
             {
-                usuario.Clave = Utilidades.EncriptarClave(usuario.Clave);
-                _context.Add(usuario);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    usuario.Clave = Utilidades.EncriptarClave(usuario.Clave);
+                    _context.Add(usuario);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                return View(usuario);
             }
-            return View(usuario);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear usuario {Correo}", usuario?.Correo);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         // GET: Usuarios/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var usuario = await _context.Usuario.FindAsync(id);
-            if (usuario == null)
-            {
-                return NotFound();
+                var usuario = await _context.Usuario.FindAsync(id);
+                if (usuario == null)
+                {
+                    return NotFound();
+                }
+                return View(usuario);
             }
-            return View(usuario);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar Usuarios/Edit {Id}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         // POST: Usuarios/Edit/5
@@ -113,6 +155,7 @@ namespace TorneoSolar.Controllers
                     }
                     else
                     {
+                        _logger.LogError("Conflicto de concurrencia al editar Usuario {Id}", usuario.UsuarioId);
                         throw;
                     }
                 }
@@ -124,19 +167,27 @@ namespace TorneoSolar.Controllers
         // GET: Usuarios/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var usuario = await _context.Usuario
-                .FirstOrDefaultAsync(m => m.UsuarioId == id);
-            if (usuario == null)
+                var usuario = await _context.Usuario
+                    .FirstOrDefaultAsync(m => m.UsuarioId == id);
+                if (usuario == null)
+                {
+                    return NotFound();
+                }
+
+                return View(usuario);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error al cargar Usuarios/Delete {Id}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            return View(usuario);
         }
 
         // POST: Usuarios/Delete/5
@@ -144,14 +195,22 @@ namespace TorneoSolar.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var usuario = await _context.Usuario.FindAsync(id);
-            if (usuario != null)
+            try
             {
-                _context.Usuario.Remove(usuario);
-            }
+                var usuario = await _context.Usuario.FindAsync(id);
+                if (usuario != null)
+                {
+                    _context.Usuario.Remove(usuario);
+                }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar Usuario {Id}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         private bool UsuarioExists(int id)

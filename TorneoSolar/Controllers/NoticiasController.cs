@@ -16,47 +16,81 @@ namespace TorneoSolar.Controllers
     public class NoticiasController : Controller
     {
         private readonly TorneoSolarContext _context;
+        private readonly ILogger<NoticiasController> _logger;
         private readonly string _uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/noticias");
 
-        public NoticiasController(TorneoSolarContext context)
+        public NoticiasController(TorneoSolarContext context, ILogger<NoticiasController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Noticias
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Noticias.ToListAsync());
+            try
+            {
+                return View(await _context.Noticias.ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en Noticias/Index");
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         public async Task<IActionResult> Index1()
         {
-            var noticias = await _context.Noticias.ToListAsync();
-            return View(noticias);
+            try
+            {
+                var noticias = await _context.Noticias.ToListAsync();
+                return View(noticias);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en Noticias/Index1");
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         // GET: Noticias/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var noticias = await _context.Noticias
-                .FirstOrDefaultAsync(m => m.NoticiasId == id);
-            if (noticias == null)
+                var noticias = await _context.Noticias
+                    .FirstOrDefaultAsync(m => m.NoticiasId == id);
+                if (noticias == null)
+                {
+                    return NotFound();
+                }
+
+                return View(noticias);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error en Noticias/Details {Id}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            return View(noticias);
         }
 
         // GET: Noticias/Create
         public IActionResult Create()
         {
-            return View();
+            try
+            {
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar Noticias/Create");
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         // POST: Noticias/Create
@@ -97,6 +131,7 @@ namespace TorneoSolar.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error al crear noticia {Titulo}", noticias?.Titulo);
                 return BadRequest(new { message = ex.Message });
             }
         }
@@ -104,17 +139,25 @@ namespace TorneoSolar.Controllers
         // GET: Noticias/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var noticias = await _context.Noticias.FindAsync(id);
-            if (noticias == null)
-            {
-                return NotFound();
+                var noticias = await _context.Noticias.FindAsync(id);
+                if (noticias == null)
+                {
+                    return NotFound();
+                }
+                return View(noticias);
             }
-            return View(noticias);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar Noticias/Edit {Id}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         // POST: Noticias/Edit/5
@@ -142,6 +185,7 @@ namespace TorneoSolar.Controllers
                     }
                     else
                     {
+                        _logger.LogError("Conflicto de concurrencia al editar noticia {Id}", noticias.NoticiasId);
                         throw;
                     }
                 }
@@ -153,19 +197,27 @@ namespace TorneoSolar.Controllers
         // GET: Noticias/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var noticias = await _context.Noticias
-                .FirstOrDefaultAsync(m => m.NoticiasId == id);
-            if (noticias == null)
+                var noticias = await _context.Noticias
+                    .FirstOrDefaultAsync(m => m.NoticiasId == id);
+                if (noticias == null)
+                {
+                    return NotFound();
+                }
+
+                return View(noticias);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error al cargar Noticias/Delete {Id}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            return View(noticias);
         }
 
         // POST: Noticias/Delete/5
@@ -173,14 +225,22 @@ namespace TorneoSolar.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var noticias = await _context.Noticias.FindAsync(id);
-            if (noticias != null)
+            try
             {
-                _context.Noticias.Remove(noticias);
-            }
+                var noticias = await _context.Noticias.FindAsync(id);
+                if (noticias != null)
+                {
+                    _context.Noticias.Remove(noticias);
+                }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar noticia {Id}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         private bool NoticiasExists(int id)

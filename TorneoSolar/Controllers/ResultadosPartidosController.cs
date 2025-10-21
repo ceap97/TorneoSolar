@@ -13,33 +13,43 @@ namespace TorneoSolar.Controllers
     public class ResultadosPartidosController : Controller
     {
         private readonly TorneoSolarContext _context;
+        private readonly ILogger<ResultadosPartidosController> _logger;
 
-        public ResultadosPartidosController(TorneoSolarContext context)
+        public ResultadosPartidosController(TorneoSolarContext context, ILogger<ResultadosPartidosController> logger)
         {
             _context = context;
+            _logger = logger;
         }
         [HttpGet]
         public async Task<JsonResult> GetDetallesPartido(int partidoId)
         {
-            var partido = await _context.Partidos
-                .Include(p => p.LocalEquipo)
-                .Include(p => p.VisitanteEquipo)
-                .FirstOrDefaultAsync(p => p.PartidoId == partidoId);
-
-            if (partido == null)
+            try
             {
-                return Json(new { success = false, message = "Partido no encontrado" });
+                var partido = await _context.Partidos
+                    .Include(p => p.LocalEquipo)
+                    .Include(p => p.VisitanteEquipo)
+                    .FirstOrDefaultAsync(p => p.PartidoId == partidoId);
+
+                if (partido == null)
+                {
+                    return Json(new { success = false, message = "Partido no encontrado" });
+                }
+
+                var detallesPartido = new
+                {
+                    partido.PartidoId,
+                    LocalEquipo = partido.LocalEquipo.Nombre,
+                    VisitanteEquipo = partido.VisitanteEquipo.Nombre,
+                    FechaHora = partido.FechaHora
+                };
+
+                return Json(new { success = true, detallesPartido });
             }
-
-            var detallesPartido = new
+            catch (Exception ex)
             {
-                partido.PartidoId,
-                LocalEquipo = partido.LocalEquipo.Nombre,
-                VisitanteEquipo = partido.VisitanteEquipo.Nombre,
-                FechaHora = partido.FechaHora
-            };
-
-            return Json(new { success = true, detallesPartido });
+                _logger.LogError(ex, "Error al obtener detalles del partido {PartidoId}", partidoId);
+                return Json(new { success = false, message = "Error interno" });
+            }
         }
 
         private async Task RevertirTablaPosiciones(ResultadosPartido resultadosPartido)
@@ -218,33 +228,57 @@ namespace TorneoSolar.Controllers
         // GET: ResultadosPartidos
         public async Task<IActionResult> Index()
         {
-            var torneoSolarContext = _context.ResultadosPartidos.Include(r => r.Partido);
-            return View(await torneoSolarContext.ToListAsync());
+            try
+            {
+                var torneoSolarContext = _context.ResultadosPartidos.Include(r => r.Partido);
+                return View(await torneoSolarContext.ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en ResultadosPartidos/Index");
+                return RedirectToAction("Error", "Home");
+            }
         }
         public async Task<IActionResult> Index1()
         {
-            var torneoSolarContext = _context.ResultadosPartidos.Include(r => r.Partido);
-            return View(await torneoSolarContext.ToListAsync());
+            try
+            {
+                var torneoSolarContext = _context.ResultadosPartidos.Include(r => r.Partido);
+                return View(await torneoSolarContext.ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en ResultadosPartidos/Index1");
+                return RedirectToAction("Error", "Home");
+            }
         }
         [Authorize]
 
         // GET: ResultadosPartidos/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var resultadosPartido = await _context.ResultadosPartidos
-                .Include(r => r.Partido)
-                .FirstOrDefaultAsync(m => m.ResultadoId == id);
-            if (resultadosPartido == null)
+                var resultadosPartido = await _context.ResultadosPartidos
+                    .Include(r => r.Partido)
+                    .FirstOrDefaultAsync(m => m.ResultadoId == id);
+                if (resultadosPartido == null)
+                {
+                    return NotFound();
+                }
+
+                return View(resultadosPartido);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error en ResultadosPartidos/Details {Id}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            return View(resultadosPartido);
         }
 
         // GET: ResultadosPartidos/Create
@@ -252,19 +286,27 @@ namespace TorneoSolar.Controllers
 
         public IActionResult Create()
         {
-            var partidosSinResultado = _context.Partidos
-                .Include(p => p.LocalEquipo)
-                .Include(p => p.VisitanteEquipo)
-                .Where(p => !_context.ResultadosPartidos.Any(rp => rp.PartidoId == p.PartidoId))
-                .Select(p => new
-                {
-                    p.PartidoId,
-                    NombrePartido = $"{p.LocalEquipo.Nombre} vs {p.VisitanteEquipo.Nombre} - {p.FechaHora}"
-                })
-                .ToList();
+            try
+            {
+                var partidosSinResultado = _context.Partidos
+                    .Include(p => p.LocalEquipo)
+                    .Include(p => p.VisitanteEquipo)
+                    .Where(p => !_context.ResultadosPartidos.Any(rp => rp.PartidoId == p.PartidoId))
+                    .Select(p => new
+                    {
+                        p.PartidoId,
+                        NombrePartido = $"{p.LocalEquipo.Nombre} vs {p.VisitanteEquipo.Nombre} - {p.FechaHora}"
+                    })
+                    .ToList();
 
-            ViewData["PartidoId"] = new SelectList(partidosSinResultado, "PartidoId", "NombrePartido");
-            return View();
+                ViewData["PartidoId"] = new SelectList(partidosSinResultado, "PartidoId", "NombrePartido");
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar ResultadosPartidos/Create");
+                return RedirectToAction("Error", "Home");
+            }
         }
 
 
@@ -277,16 +319,24 @@ namespace TorneoSolar.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ResultadoId,PartidoId,PuntosLocal,PuntosVisitante")] ResultadosPartido resultadosPartido)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(resultadosPartido);
-                await _context.SaveChangesAsync();
-                await ActualizarTablaPosiciones(resultadosPartido);
-                await ActualizarTablaPosicionesFem(resultadosPartido);
-                return RedirectToAction(nameof(Index1));
+                if (ModelState.IsValid)
+                {
+                    _context.Add(resultadosPartido);
+                    await _context.SaveChangesAsync();
+                    await ActualizarTablaPosiciones(resultadosPartido);
+                    await ActualizarTablaPosicionesFem(resultadosPartido);
+                    return RedirectToAction(nameof(Index1));
+                }
+                ViewData["PartidoId"] = new SelectList(_context.Partidos, "PartidoId", "PartidoId", resultadosPartido.PartidoId);
+                return View(resultadosPartido);
             }
-            ViewData["PartidoId"] = new SelectList(_context.Partidos, "PartidoId", "PartidoId", resultadosPartido.PartidoId);
-            return View(resultadosPartido);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear resultado de partido");
+                return RedirectToAction("Error", "Home");
+            }
         }
 
 
@@ -295,18 +345,26 @@ namespace TorneoSolar.Controllers
 
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var resultadosPartido = await _context.ResultadosPartidos.FindAsync(id);
-            if (resultadosPartido == null)
-            {
-                return NotFound();
+                var resultadosPartido = await _context.ResultadosPartidos.FindAsync(id);
+                if (resultadosPartido == null)
+                {
+                    return NotFound();
+                }
+                ViewData["PartidoId"] = new SelectList(_context.Partidos, "PartidoId", "PartidoId", resultadosPartido.PartidoId);
+                return View(resultadosPartido);
             }
-            ViewData["PartidoId"] = new SelectList(_context.Partidos, "PartidoId", "PartidoId", resultadosPartido.PartidoId);
-            return View(resultadosPartido);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar ResultadosPartidos/Edit {Id}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
         [Authorize]
 
@@ -343,6 +401,7 @@ namespace TorneoSolar.Controllers
                     }
                     else
                     {
+                        _logger.LogError("Conflicto de concurrencia al editar resultado {Id}", resultadosPartido.ResultadoId);
                         throw;
                     }
                 }
@@ -357,20 +416,28 @@ namespace TorneoSolar.Controllers
 
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var resultadosPartido = await _context.ResultadosPartidos
-                .Include(r => r.Partido)
-                .FirstOrDefaultAsync(m => m.ResultadoId == id);
-            if (resultadosPartido == null)
+                var resultadosPartido = await _context.ResultadosPartidos
+                    .Include(r => r.Partido)
+                    .FirstOrDefaultAsync(m => m.ResultadoId == id);
+                if (resultadosPartido == null)
+                {
+                    return NotFound();
+                }
+
+                return View(resultadosPartido);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error al cargar ResultadosPartidos/Delete {Id}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            return View(resultadosPartido);
         }
         [Authorize]
 
@@ -379,15 +446,23 @@ namespace TorneoSolar.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var resultadosPartido = await _context.ResultadosPartidos.FindAsync(id);
-            if (resultadosPartido != null)
+            try
             {
-                await RevertirTablaPosiciones(resultadosPartido);
-                await RevertirTablaPosicionesFem(resultadosPartido);
-                _context.ResultadosPartidos.Remove(resultadosPartido);
-                await _context.SaveChangesAsync();
+                var resultadosPartido = await _context.ResultadosPartidos.FindAsync(id);
+                if (resultadosPartido != null)
+                {
+                    await RevertirTablaPosiciones(resultadosPartido);
+                    await RevertirTablaPosicionesFem(resultadosPartido);
+                    _context.ResultadosPartidos.Remove(resultadosPartido);
+                    await _context.SaveChangesAsync();
+                }
+                return RedirectToAction(nameof(Index1));
             }
-            return RedirectToAction(nameof(Index1));
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar resultado {Id}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         private bool ResultadosPartidoExists(int id)

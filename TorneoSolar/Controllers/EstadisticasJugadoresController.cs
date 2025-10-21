@@ -15,80 +15,122 @@ namespace TorneoSolar.Controllers
     public class EstadisticasJugadoresController : Controller
     {
         private readonly TorneoSolarContext _context;
+        private readonly ILogger<EstadisticasJugadoresController> _logger;
 
-        public EstadisticasJugadoresController(TorneoSolarContext context)
+        public EstadisticasJugadoresController(TorneoSolarContext context, ILogger<EstadisticasJugadoresController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<JsonResult> GetJugadoresPorPartido(int partidoId)
         {
-            var partido = await _context.Partidos
-                .Include(p => p.LocalEquipo)
-                .Include(p => p.VisitanteEquipo)
-                .FirstOrDefaultAsync(p => p.PartidoId == partidoId);
-
-            if (partido == null)
+            try
             {
-                return Json(new { success = false, message = "Partido no encontrado" });
+                var partido = await _context.Partidos
+                    .Include(p => p.LocalEquipo)
+                    .Include(p => p.VisitanteEquipo)
+                    .FirstOrDefaultAsync(p => p.PartidoId == partidoId);
+
+                if (partido == null)
+                {
+                    return Json(new { success = false, message = "Partido no encontrado" });
+                }
+
+                var jugadores = await _context.Jugadores
+                    .Where(j => j.EquipoId == partido.LocalEquipoId || j.EquipoId == partido.VisitanteEquipoId)
+                    .Select(j => new { j.JugadorId, j.Nombre })
+                    .ToListAsync();
+
+                return Json(new { success = true, jugadores });
             }
-
-            var jugadores = await _context.Jugadores
-                .Where(j => j.EquipoId == partido.LocalEquipoId || j.EquipoId == partido.VisitanteEquipoId)
-                .Select(j => new { j.JugadorId, j.Nombre })
-                .ToListAsync();
-
-            return Json(new { success = true, jugadores });
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener jugadores por partido {PartidoId}", partidoId);
+                return Json(new { success = false, message = "Error interno" });
+            }
         }
 
         // GET: EstadisticasJugadores
         public async Task<IActionResult> Index()
         {
-            var torneoSolarContext = _context.EstadisticasJugadores.Include(e => e.Jugador).Include(e => e.Partido);
-            return View(await torneoSolarContext.ToListAsync());
+            try
+            {
+                var torneoSolarContext = _context.EstadisticasJugadores.Include(e => e.Jugador).Include(e => e.Partido);
+                return View(await torneoSolarContext.ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en EstadisticasJugadores/Index");
+                return RedirectToAction("Error", "Home");
+            }
         }
         public async Task<IActionResult> Index1()
         {
-            var torneoSolarContext = _context.EstadisticasJugadores.Include(e => e.Jugador).Include(e => e.Partido);
-            return View(await torneoSolarContext.ToListAsync());
+            try
+            {
+                var torneoSolarContext = _context.EstadisticasJugadores.Include(e => e.Jugador).Include(e => e.Partido);
+                return View(await torneoSolarContext.ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en EstadisticasJugadores/Index1");
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         // GET: EstadisticasJugadores/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var estadisticasJugadore = await _context.EstadisticasJugadores
-                .Include(e => e.Jugador)
-                .Include(e => e.Partido)
-                .FirstOrDefaultAsync(m => m.EstadisticaId == id);
-            if (estadisticasJugadore == null)
+                var estadisticasJugadore = await _context.EstadisticasJugadores
+                    .Include(e => e.Jugador)
+                    .Include(e => e.Partido)
+                    .FirstOrDefaultAsync(m => m.EstadisticaId == id);
+                if (estadisticasJugadore == null)
+                {
+                    return NotFound();
+                }
+
+                return View(estadisticasJugadore);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error en EstadisticasJugadores/Details {Id}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            return View(estadisticasJugadore);
         }
 
         // GET: EstadisticasJugadores/Create
         public IActionResult Create()
         {
-            ViewData["PartidoId"] = new SelectList(_context.Partidos
-                .Include(p => p.LocalEquipo)
-                .Include(p => p.VisitanteEquipo)
-                .Select(p => new
-                {
-                    p.PartidoId,
-                    NombrePartido = $"{p.LocalEquipo.Nombre} vs {p.VisitanteEquipo.Nombre} - {p.FechaHora}"
-                }), "PartidoId", "NombrePartido");
+            try
+            {
+                ViewData["PartidoId"] = new SelectList(_context.Partidos
+                    .Include(p => p.LocalEquipo)
+                    .Include(p => p.VisitanteEquipo)
+                    .Select(p => new
+                    {
+                        p.PartidoId,
+                        NombrePartido = $"{p.LocalEquipo.Nombre} vs {p.VisitanteEquipo.Nombre} - {p.FechaHora}"
+                    }), "PartidoId", "NombrePartido");
 
-            ViewData["JugadorId"] = new SelectList(Enumerable.Empty<SelectListItem>(), "JugadorId", "Nombre");
+                ViewData["JugadorId"] = new SelectList(Enumerable.Empty<SelectListItem>(), "JugadorId", "Nombre");
 
-            return View();
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar EstadisticasJugadores/Create");
+                return RedirectToAction("Error", "Home");
+            }
         }
 
 
@@ -99,33 +141,49 @@ namespace TorneoSolar.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("EstadisticaId,JugadorId,PartidoId,Puntos,Rebotes,Asistencias,Bloqueos,Robos,MinutosJugados")] EstadisticasJugadore estadisticasJugadore)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(estadisticasJugadore);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    _context.Add(estadisticasJugadore);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                ViewData["JugadorId"] = new SelectList(_context.Jugadores, "JugadorId", "JugadorId", estadisticasJugadore.JugadorId);
+                ViewData["PartidoId"] = new SelectList(_context.Partidos, "PartidoId", "PartidoId", estadisticasJugadore.PartidoId);
+                return View(estadisticasJugadore);
             }
-            ViewData["JugadorId"] = new SelectList(_context.Jugadores, "JugadorId", "JugadorId", estadisticasJugadore.JugadorId);
-            ViewData["PartidoId"] = new SelectList(_context.Partidos, "PartidoId", "PartidoId", estadisticasJugadore.PartidoId);
-            return View(estadisticasJugadore);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear estadística de jugador {JugadorId}", estadisticasJugadore?.JugadorId);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         // GET: EstadisticasJugadores/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var estadisticasJugadore = await _context.EstadisticasJugadores.FindAsync(id);
-            if (estadisticasJugadore == null)
-            {
-                return NotFound();
+                var estadisticasJugadore = await _context.EstadisticasJugadores.FindAsync(id);
+                if (estadisticasJugadore == null)
+                {
+                    return NotFound();
+                }
+                ViewData["JugadorId"] = new SelectList(_context.Jugadores, "JugadorId", "JugadorId", estadisticasJugadore.JugadorId);
+                ViewData["PartidoId"] = new SelectList(_context.Partidos, "PartidoId", "PartidoId", estadisticasJugadore.PartidoId);
+                return View(estadisticasJugadore);
             }
-            ViewData["JugadorId"] = new SelectList(_context.Jugadores, "JugadorId", "JugadorId", estadisticasJugadore.JugadorId);
-            ViewData["PartidoId"] = new SelectList(_context.Partidos, "PartidoId", "PartidoId", estadisticasJugadore.PartidoId);
-            return View(estadisticasJugadore);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar EstadisticasJugadores/Edit {Id}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         // POST: EstadisticasJugadores/Edit/5
@@ -155,6 +213,7 @@ namespace TorneoSolar.Controllers
                     }
                     else
                     {
+                        _logger.LogError("Conflicto de concurrencia al editar estadística {Id}", estadisticasJugadore.EstadisticaId);
                         throw;
                     }
                 }
@@ -168,21 +227,29 @@ namespace TorneoSolar.Controllers
         // GET: EstadisticasJugadores/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var estadisticasJugadore = await _context.EstadisticasJugadores
-                .Include(e => e.Jugador)
-                .Include(e => e.Partido)
-                .FirstOrDefaultAsync(m => m.EstadisticaId == id);
-            if (estadisticasJugadore == null)
+                var estadisticasJugadore = await _context.EstadisticasJugadores
+                    .Include(e => e.Jugador)
+                    .Include(e => e.Partido)
+                    .FirstOrDefaultAsync(m => m.EstadisticaId == id);
+                if (estadisticasJugadore == null)
+                {
+                    return NotFound();
+                }
+
+                return View(estadisticasJugadore);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error al cargar EstadisticasJugadores/Delete {Id}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            return View(estadisticasJugadore);
         }
 
         // POST: EstadisticasJugadores/Delete/5
@@ -190,14 +257,22 @@ namespace TorneoSolar.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var estadisticasJugadore = await _context.EstadisticasJugadores.FindAsync(id);
-            if (estadisticasJugadore != null)
+            try
             {
-                _context.EstadisticasJugadores.Remove(estadisticasJugadore);
-            }
+                var estadisticasJugadore = await _context.EstadisticasJugadores.FindAsync(id);
+                if (estadisticasJugadore != null)
+                {
+                    _context.EstadisticasJugadores.Remove(estadisticasJugadore);
+                }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar EstadisticasJugadores {Id}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         private bool EstadisticasJugadoreExists(int id)

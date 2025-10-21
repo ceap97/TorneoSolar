@@ -13,43 +13,69 @@ namespace TorneoSolar.Controllers
     public class TablaPosicionesFemController : Controller
     {
         private readonly TorneoSolarContext _context;
+        private readonly ILogger<TablaPosicionesFemController> _logger;
 
-        public TablaPosicionesFemController(TorneoSolarContext context)
+        public TablaPosicionesFemController(TorneoSolarContext context, ILogger<TablaPosicionesFemController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: TablaPosicioness
         public async Task<IActionResult> Index()
         {
-            var torneoSolarContext = _context.TablaPosicionesFem.Include(t => t.Equipo);
-            return View(await torneoSolarContext.ToListAsync());
+            try
+            {
+                var torneoSolarContext = _context.TablaPosicionesFem.Include(t => t.Equipo);
+                return View(await torneoSolarContext.ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en TablaPosicionesFem/Index");
+                return RedirectToAction("Error", "Home");
+            }
         }
         [Authorize]
         public async Task<IActionResult> Index1()
         {
-            var torneoSolarContext = _context.TablaPosicionesFem.Include(t => t.Equipo);
-            return View(await torneoSolarContext.ToListAsync());
+            try
+            {
+                var torneoSolarContext = _context.TablaPosicionesFem.Include(t => t.Equipo);
+                return View(await torneoSolarContext.ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en TablaPosicionesFem/Index1");
+                return RedirectToAction("Error", "Home");
+            }
         }
         [Authorize]
 
         // GET: TablaPosicioness/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var TablaPosicionesFem = await _context.TablaPosicionesFem
-                .Include(t => t.Equipo)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (TablaPosicionesFem == null)
+                var TablaPosicionesFem = await _context.TablaPosicionesFem
+                    .Include(t => t.Equipo)
+                    .FirstOrDefaultAsync(m => m.Id == id);
+                if (TablaPosicionesFem == null)
+                {
+                    return NotFound();
+                }
+
+                return View(TablaPosicionesFem);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error en TablaPosicionesFem/Details {Id}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            return View(TablaPosicionesFem);
         }
 
         [Authorize]
@@ -58,8 +84,16 @@ namespace TorneoSolar.Controllers
         // GET: TablaPosicioness/Create
         public IActionResult Create()
         {
-            ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre");
-            return View();
+            try
+            {
+                ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre");
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar TablaPosicionesFem/Create");
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         [Authorize]
@@ -69,14 +103,22 @@ namespace TorneoSolar.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,EquipoId,PJ,PG,PP,Puntos,PtsFavor,PtsContra")] TablaPosicionesFem TablaPosicionesFem)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(TablaPosicionesFem);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index1));
+                if (ModelState.IsValid)
+                {
+                    _context.Add(TablaPosicionesFem);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index1));
+                }
+                ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre", TablaPosicionesFem.EquipoId);
+                return View(TablaPosicionesFem);
             }
-            ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre", TablaPosicionesFem.EquipoId);
-            return View(TablaPosicionesFem);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear registro TablaPosicionesFem");
+                return RedirectToAction("Error", "Home");
+            }
         }
 
 
@@ -85,18 +127,26 @@ namespace TorneoSolar.Controllers
         // GET: TablaPosicioness/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var TablaPosicionesFem = await _context.TablaPosicionesFem.FindAsync(id);
-            if (TablaPosicionesFem == null)
-            {
-                return NotFound();
+                var TablaPosicionesFem = await _context.TablaPosicionesFem.FindAsync(id);
+                if (TablaPosicionesFem == null)
+                {
+                    return NotFound();
+                }
+                ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "EquipoId", TablaPosicionesFem.EquipoId);
+                return View(TablaPosicionesFem);
             }
-            ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "EquipoId", TablaPosicionesFem.EquipoId);
-            return View(TablaPosicionesFem);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar TablaPosicionesFem/Edit {Id}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
         [Authorize]
 
@@ -127,6 +177,7 @@ namespace TorneoSolar.Controllers
                     }
                     else
                     {
+                        _logger.LogError("Conflicto de concurrencia al editar TablaPosicionesFem {Id}", TablaPosicionesFem.Id);
                         throw;
                     }
                 }
@@ -141,20 +192,28 @@ namespace TorneoSolar.Controllers
         // GET: TablaPosicioness/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var TablaPosicionesFem = await _context.TablaPosicionesFem
-                .Include(t => t.Equipo)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (TablaPosicionesFem == null)
+                var TablaPosicionesFem = await _context.TablaPosicionesFem
+                    .Include(t => t.Equipo)
+                    .FirstOrDefaultAsync(m => m.Id == id);
+                if (TablaPosicionesFem == null)
+                {
+                    return NotFound();
+                }
+
+                return View(TablaPosicionesFem);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error al cargar TablaPosicionesFem/Delete {Id}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            return View(TablaPosicionesFem);
         }
         [Authorize]
 
@@ -163,14 +222,22 @@ namespace TorneoSolar.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var TablaPosicionesFem = await _context.TablaPosicionesFem.FindAsync(id);
-            if (TablaPosicionesFem != null)
+            try
             {
-                _context.TablaPosicionesFem.Remove(TablaPosicionesFem);
-            }
+                var TablaPosicionesFem = await _context.TablaPosicionesFem.FindAsync(id);
+                if (TablaPosicionesFem != null)
+                {
+                    _context.TablaPosicionesFem.Remove(TablaPosicionesFem);
+                }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index1));
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index1));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar TablaPosicionesFem {Id}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         private bool TablaPosicionesExists(int id)

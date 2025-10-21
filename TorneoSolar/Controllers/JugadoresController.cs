@@ -15,71 +15,105 @@ namespace TorneoSolar.Controllers
     public class JugadoresController : Controller
     {
         private readonly TorneoSolarContext _context;
+        private readonly ILogger<JugadoresController> _logger;
         private readonly string _uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/jugadores");
 
-        public JugadoresController(TorneoSolarContext context)
+        public JugadoresController(TorneoSolarContext context, ILogger<JugadoresController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public IActionResult Index(int? equipoId)
         {
-            var jugadores = _context.Jugadores.AsQueryable();
-
-            if (equipoId.HasValue)
+            try
             {
-                jugadores = jugadores.Where(j => j.EquipoId == equipoId.Value);
-            }
+                var jugadores = _context.Jugadores.AsQueryable();
 
-            return View(jugadores.ToList());
+                if (equipoId.HasValue)
+                {
+                    jugadores = jugadores.Where(j => j.EquipoId == equipoId.Value);
+                }
+
+                return View(jugadores.ToList());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en Jugadores/Index equipoId={EquipoId}", equipoId);
+                return RedirectToAction("Error", "Home");
+            }
         }
         [Authorize]
 
         public async Task<IActionResult> Index1()
         {
-            var torneoSolarContext = _context.Jugadores.Include(j => j.Equipo);
-            return View(await torneoSolarContext.ToListAsync());
+            try
+            {
+                var torneoSolarContext = _context.Jugadores.Include(j => j.Equipo);
+                return View(await torneoSolarContext.ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en Jugadores/Index1");
+                return RedirectToAction("Error", "Home");
+            }
         }
         public async Task<IActionResult> Details1(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var jugadore = await _context.Jugadores
-                .Include(j => j.Equipo)
-                .FirstOrDefaultAsync(m => m.JugadorId == id);
-            if (jugadore == null)
+                var jugadore = await _context.Jugadores
+                    .Include(j => j.Equipo)
+                    .FirstOrDefaultAsync(m => m.JugadorId == id);
+                if (jugadore == null)
+                {
+                    return NotFound();
+                }
+
+                return View(jugadore);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error en Jugadores/Details1 {Id}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            return View(jugadore);
         }
         // GET: Jugadores/Details/5
         [HttpGet]
         public async Task<IActionResult> GetJugadorDetails(int id)
         {
-            var jugadore = await _context.Jugadores
-                .Include(j => j.Equipo)
-                .FirstOrDefaultAsync(m => m.JugadorId == id);
-
-            if (jugadore == null)
+            try
             {
-                return NotFound();
+                var jugadore = await _context.Jugadores
+                    .Include(j => j.Equipo)
+                    .FirstOrDefaultAsync(m => m.JugadorId == id);
+
+                if (jugadore == null)
+                {
+                    return NotFound();
+                }
+
+                return Json(new
+                {
+                    jugadore.Nombre,
+                    jugadore.FechaNacimiento,
+                    jugadore.Identificacion,
+                    jugadore.Peso,
+                    jugadore.Altura,
+                    jugadore.Posicion,
+                    Equipo = jugadore.Equipo?.Nombre
+                });
             }
-
-            return Json(new
+            catch (Exception ex)
             {
-                jugadore.Nombre,
-                jugadore.FechaNacimiento,
-                jugadore.Identificacion,
-                jugadore.Peso,
-                jugadore.Altura,
-                jugadore.Posicion,
-                Equipo = jugadore.Equipo?.Nombre
-            });
+                _logger.LogError(ex, "Error al obtener detalles JSON del jugador {Id}", id);
+                return Json(new { error = true, message = "Error interno" });
+            }
         }
 
         [Authorize]
@@ -87,8 +121,16 @@ namespace TorneoSolar.Controllers
         // GET: Jugadores/Create
         public IActionResult Create()
         {
-            ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre");
-            return View();
+            try
+            {
+                ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre");
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar Jugadores/Create");
+                return RedirectToAction("Error", "Home");
+            }
         }
         [Authorize]
 
@@ -132,6 +174,7 @@ namespace TorneoSolar.Controllers
             catch (Exception ex)
             {
                 // Proporcionar un mensaje de error detallado
+                _logger.LogError(ex, "Error al crear jugador {Nombre}", jugadore?.Nombre);
                 ModelState.AddModelError(string.Empty, $"Error al crear el jugador: {ex.Message}");
                 ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "Nombre", jugadore.EquipoId);
                 return View(jugadore);
@@ -141,18 +184,26 @@ namespace TorneoSolar.Controllers
 
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var jugadore = await _context.Jugadores.FindAsync(id);
-            if (jugadore == null)
-            {
-                return NotFound();
+                var jugadore = await _context.Jugadores.FindAsync(id);
+                if (jugadore == null)
+                {
+                    return NotFound();
+                }
+                ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "EquipoId", jugadore.EquipoId);
+                return View(jugadore);
             }
-            ViewData["EquipoId"] = new SelectList(_context.Equipos, "EquipoId", "EquipoId", jugadore.EquipoId);
-            return View(jugadore);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar Jugadores/Edit {Id}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
         [Authorize]
 
@@ -183,6 +234,7 @@ namespace TorneoSolar.Controllers
                     }
                     else
                     {
+                        _logger.LogError("Conflicto de concurrencia al editar jugador {Id}", jugadore.JugadorId);
                         throw;
                     }
                 }
@@ -196,20 +248,28 @@ namespace TorneoSolar.Controllers
         // GET: Jugadores/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var jugadore = await _context.Jugadores
-                .Include(j => j.Equipo)
-                .FirstOrDefaultAsync(m => m.JugadorId == id);
-            if (jugadore == null)
+                var jugadore = await _context.Jugadores
+                    .Include(j => j.Equipo)
+                    .FirstOrDefaultAsync(m => m.JugadorId == id);
+                if (jugadore == null)
+                {
+                    return NotFound();
+                }
+
+                return View(jugadore);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Error al cargar Jugadores/Delete {Id}", id);
+                return RedirectToAction("Error", "Home");
             }
-
-            return View(jugadore);
         }
         [Authorize]
 
@@ -218,14 +278,22 @@ namespace TorneoSolar.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var jugadore = await _context.Jugadores.FindAsync(id);
-            if (jugadore != null)
+            try
             {
-                _context.Jugadores.Remove(jugadore);
-            }
+                var jugadore = await _context.Jugadores.FindAsync(id);
+                if (jugadore != null)
+                {
+                    _context.Jugadores.Remove(jugadore);
+                }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index1));
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index1));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar jugador {Id}", id);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         private bool JugadoreExists(int id)
