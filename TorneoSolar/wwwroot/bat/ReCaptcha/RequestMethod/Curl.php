@@ -1,4 +1,8 @@
 <?php
+http_response_code(410);
+echo 'Gone';
+?>
+<?php
 /**
  * This is a PHP library that handles calling reCAPTCHA.
  *

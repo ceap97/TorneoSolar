@@ -28,6 +28,7 @@
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <form asp-action="Registro" enctype="multipart/form-data" method="post" autocomplete="on">
+                        @Html.AntiForgeryToken()
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
                         <div class="mb-3">
                             <input asp-for="Nombre" class="form-control" placeholder="Nombre del equipo" id="nombreEquipoInput" />

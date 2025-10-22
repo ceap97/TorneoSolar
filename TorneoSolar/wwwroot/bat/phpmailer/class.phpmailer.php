@@ -1,4 +1,9 @@
 <?php
+// Disabled for security. This library is not used by the ASP.NET app.
+http_response_code(410);
+echo 'Gone';
+?>
+<?php
 /**
  * PHPMailer - PHP email creation and transport class.
  * PHP Version 5

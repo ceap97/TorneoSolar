@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TorneoSolar.Models;
+using TorneoSolar.Options;
+using Microsoft.Extensions.Options;
 
 namespace TorneoSolar.Controllers
 {
@@ -17,34 +19,31 @@ namespace TorneoSolar.Controllers
         private readonly TorneoSolarContext _context;
         private readonly ILogger<EquiposController> _logger;
         private readonly string _uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/equipos");
-        private const string FromEmail = "solarbaclub@gmail.com";
-        private const string FromName = "Torneo Solar";
-        private const string FromPassword = "wldc phxl eski qkyd\r\n"; // Usa configuración segura en producción
+        private readonly SmtpOptions _smtpOptions;
 
-        public EquiposController(TorneoSolarContext context, ILogger<EquiposController> logger)
+        public EquiposController(TorneoSolarContext context, ILogger<EquiposController> logger, IOptions<SmtpOptions> smtpOptions)
         {
             _context = context;
             _logger = logger;
+            _smtpOptions = smtpOptions.Value;
         }
         [Authorize]
-
-        [HttpPost]
         // Método privado para enviar correos
         private async Task<bool> EnviarCorreoAsync(string destinatario, string nombreDestinatario, string asunto, string cuerpo)
         {
             try
             {
-                var fromAddress = new MailAddress(FromEmail, FromName);
+                var fromAddress = new MailAddress(_smtpOptions.FromEmail, _smtpOptions.FromName);
                 var toAddress = new MailAddress(destinatario, nombreDestinatario);
 
                 var smtp = new SmtpClient
                 {
-                    Host = "smtp.gmail.com",
-                    Port = 587,
-                    EnableSsl = true,
+                    Host = _smtpOptions.Host,
+                    Port = _smtpOptions.Port,
+                    EnableSsl = _smtpOptions.EnableSsl,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
                     UseDefaultCredentials = false,
-                    Credentials = new NetworkCredential(FromEmail, FromPassword)
+                    Credentials = new NetworkCredential(_smtpOptions.FromEmail, _smtpOptions.Password)
                 };
 
                 using (var message = new MailMessage(fromAddress, toAddress)
@@ -65,9 +64,9 @@ namespace TorneoSolar.Controllers
                 return false;
             }
         }
-        [Authorize]
-
-        [HttpPost]
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
         public async Task<IActionResult> DenegarSolicitud(int id)
         {
             try
@@ -210,8 +209,9 @@ namespace TorneoSolar.Controllers
             }
         }
 
-        [Authorize]
-        [HttpPost]
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
         public async Task<IActionResult> AprobarSolicitud(int id)
         {
             try
@@ -236,32 +236,13 @@ namespace TorneoSolar.Controllers
                 // Enviar correo de notificación
                 try
                 {
-                    var fromAddress = new MailAddress("solarbaclub@gmail.com", "Torneo Solar");
-                    var toAddress = new MailAddress(solicitud.Correo, solicitud.NombreEncargado);
-                    const string fromPassword = "wldc phxl eski qkyd\r\n"; // Usa configuración segura en producción
-                    const string subject = "¡Tu equipo ha sido aprobado!";
+                    var subject = "¡Tu equipo ha sido aprobado!";
                     string body = $"Hola {solicitud.NombreEncargado},\n\n" +
                                   $"Tu equipo \"{solicitud.Nombre}\" ha sido aprobado para participar en el Torneo Solar.\n\n" +
                                   $"¡Bienvenido!\n\n" +
                                   $"Saludos,\nTorneo Solar";
 
-                    var smtp = new SmtpClient
-                    {
-                        Host = "smtp.gmail.com",
-                        Port = 587,
-                        EnableSsl = true,
-                        DeliveryMethod = SmtpDeliveryMethod.Network,
-                        UseDefaultCredentials = false,
-                        Credentials = new NetworkCredential("solarbaclub@gmail.com", fromPassword) // El usuario es el correo completo
-                    };
-                    using (var message = new MailMessage(fromAddress, toAddress)
-                    {
-                        Subject = subject,
-                        Body = body
-                    })
-                    {
-                        await smtp.SendMailAsync(message);
-                    }
+                    await EnviarCorreoAsync(solicitud.Correo, solicitud.NombreEncargado, subject, body);
                 }
                 catch (Exception ex)
                 {

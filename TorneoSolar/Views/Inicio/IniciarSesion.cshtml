@@ -23,7 +23,8 @@
                     <div class="card-header">
                         Iniciar Sesion
                         <div class="card-body">
-                            <form asp-controller="Inicio" asp-action="IniciarSesion"method="post">
+                            <form asp-controller="Inicio" asp-action="IniciarSesion" method="post">
+                                @Html.AntiForgeryToken()
 
                                 <input class="form-control mb-3" type="text" placeholder="Correo" required name="correo" />
                                 <input class="form-control mb-3" type="password" placeholder="Contraseña" required name="clave" />

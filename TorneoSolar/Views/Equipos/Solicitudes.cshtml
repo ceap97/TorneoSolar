@@ -84,12 +84,14 @@
                                             <td class="text-center">
                                                 <div class="d-flex justify-content-center gap-1 flex-wrap">
                                                     <form asp-action="AprobarSolicitud" method="post" class="d-inline">
+                                                        @Html.AntiForgeryToken()
                                                         <input type="hidden" name="id" value="@s.SolicitudEquipoId" />
                                                         <button type="submit" class="btn btn-success btn-sm mb-1" title="Aprobar">
                                                             <i class="bi bi-check-circle"></i>
                                                         </button>
                                                     </form>
                                                     <form asp-action="DenegarSolicitud" method="post" class="d-inline">
+                                                        @Html.AntiForgeryToken()
                                                         <input type="hidden" name="id" value="@s.SolicitudEquipoId" />
                                                         <button type="submit" class="btn btn-danger btn-sm mb-1" title="Denegar" onclick="return confirm('¿Seguro que deseas denegar y eliminar esta solicitud?');">
                                                             <i class="bi bi-x-circle"></i>

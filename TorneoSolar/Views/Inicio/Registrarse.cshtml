@@ -22,6 +22,7 @@
                         Registrate
                         <div class="card-body">
                             <form asp-controller="Inicio" asp-action="Registrarse" method="post">
+                                @Html.AntiForgeryToken()
 
                                 <input class="form-control mb-3" type="text" placeholder="Nombre Completo"asp-for="NombreUsuario" required />
                                 <input class="form-control mb-3" type="text" placeholder="Correo" asp-for="Correo" required />

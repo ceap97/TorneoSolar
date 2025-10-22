@@ -1,4 +1,9 @@
 <?php
+// Disabled for security. This endpoint is no longer available.
+http_response_code(410);
+echo 'Gone';
+?>
+<?php
 // Initiate the autoloader.
 require_once 'ReCaptcha/autoload.php';
 

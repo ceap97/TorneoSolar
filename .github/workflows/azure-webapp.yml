@@ -1,0 +1,64 @@
+name: Build and Deploy TorneoSolar to Azure App Service
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  PROJECT_PATH: 'TorneoSolar/TorneoSolar.csproj'
+  PUBLISH_DIR: 'TorneoSolar/bin/Release/publish'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore $env:PROJECT_PATH
+
+      - name: Build
+        run: dotnet build $env:PROJECT_PATH -c Release --no-restore
+
+      - name: Publish
+        run: dotnet publish $env:PROJECT_PATH -c Release -o $env:PUBLISH_DIR --no-build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: drop
+          path: ${{ env.PUBLISH_DIR }}
+
+  deploy:
+    needs: build
+    runs-on: windows-latest
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: drop
+          path: publish
+
+      - name: Zip artifact
+        shell: powershell
+        run: Compress-Archive -Path publish\* -DestinationPath publish.zip -Force
+
+      - name: 'Deploy to Azure WebApp'
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: publish.zip

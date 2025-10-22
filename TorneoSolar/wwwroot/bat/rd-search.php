@@ -1,4 +1,9 @@
 <?php
+// Disabled for security. This endpoint is no longer available.
+http_response_code(410);
+echo 'Gone';
+?>
+<?php
 if (!isset($_GET['s'])) {
   die('You must define a search term!');
 }

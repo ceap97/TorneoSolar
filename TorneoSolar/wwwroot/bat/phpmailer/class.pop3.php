@@ -1,4 +1,9 @@
 <?php
+// Disabled for security. This library is not used by the ASP.NET app.
+http_response_code(410);
+echo 'Gone';
+?>
+<?php
 /**
  * PHPMailer POP-Before-SMTP Authentication Class.
  * PHP Version 5

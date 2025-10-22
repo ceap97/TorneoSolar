@@ -1,4 +1,9 @@
 <?php
+// Disabled for security. This endpoint is no longer available.
+http_response_code(410);
+echo 'Gone';
+?>
+<?php
 
 $formConfigFile = file_get_contents("rd-mailform.config.json");
 $formConfig = json_decode($formConfigFile, true);

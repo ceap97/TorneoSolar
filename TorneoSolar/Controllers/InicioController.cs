@@ -31,9 +31,10 @@ namespace TorneoSolar.Controllers
                 return RedirectToAction("Error", "Home");
             }
         }
-        [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> Registrarse(Usuario modelo)
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Registrarse(Usuario modelo)
         {
             try
             {
@@ -59,7 +60,7 @@ namespace TorneoSolar.Controllers
             {
                 try
                 {
-                    return PartialView();
+                    return View();
                 }
                 catch (Exception ex)
                 {
@@ -69,6 +70,7 @@ namespace TorneoSolar.Controllers
             }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task< IActionResult> IniciarSesion(string correo, string clave)
         {
             try
